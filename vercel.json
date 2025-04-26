@@ -1,5 +1,10 @@
 {
-  "cron": [
-    { "path": "/api/cron-sync-ebird", "schedule": "0 4 * * *" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
+  "crons": [
+    {
+      "path": "/api/cron-sync-ebird",
+      "schedule": "0 4 * * *"
+    }
   ]
 }
