@@ -1,0 +1,365 @@
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\globals.css
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\layout.tsx
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Nav from "@/components/Nav";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Bird Gacha",
+  description: "Identify and tier birds with AI",
+  colorScheme: "light dark",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Nav />
+        {children}
+      </body>
+    </html>
+  );
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\page.tsx
+export default function Home() {
+  return (
+    <main className="prose mx-auto p-6">
+      <h1 className="text-4xl font-bold mb-4">Bird Gacha</h1>
+      <p>Upload a photo of a bird, get its species and rarity tier based on your location.</p>
+      <h2 className="mt-6 text-2xl font-semibold">How it works</h2>
+      <ol className="list-decimal list-inside mt-4 space-y-2">
+        <li>Capture or upload a bird photo</li>
+        <li>Identify the species using AI</li>
+        <li>Lookup its rarity in your county</li>
+        <li>Receive a tier: S (super rare) to D (common)</li>
+      </ol>
+      <div className="mt-6">
+        <a href="/capture" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Start capturing &rarr;
+        </a>
+      </div>
+    </main>
+  );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\api\cron-sync-ebird\route.ts
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+
+// Configure Edge runtime and timeout
+export const runtime = 'edge';
+export const maxDuration = 300; // seconds
+
+// Initialize Supabase client with Service Role
+const supa = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { global: { fetch } }
+);
+const EBIRD = process.env.EBIRD_KEY!;
+
+// Fetch average monthly checklist frequency histogram for a species in a region
+async function avgHist(species: string, region: string): Promise<number> {
+  const url = `https://api.ebird.org/v2/product/histogram/${region}?spp=${species}`;
+  const res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD } });
+  if (!res.ok) throw new Error(`eBird ${res.status}: ${res.statusText}`);
+  const { histogram } = (await res.json()) as { histogram: number[] };
+  return histogram.reduce((sum, v) => sum + v, 0) / histogram.length;
+}
+
+export default async function handler(_: NextRequest) {
+  // 1) Load county and species lists
+  const { data: counties, error: cErr } = await supa.from('county').select();
+  const { data: speciesList, error: sErr } = await supa.from('species').select('species_code');
+  if (cErr || !counties) {
+    return NextResponse.json({ error: 'Failed to fetch counties', details: cErr }, { status: 500 });
+  }
+  if (sErr || !speciesList) {
+    return NextResponse.json({ error: 'Failed to fetch species', details: sErr }, { status: 500 });
+  }
+
+  // 2) Gather raw frequencies
+  const rows: { species_code: string; county_fips: string; pct: number }[] = [];
+  const batch: Promise<any>[] = [];
+  const push = (p: Promise<any>) => {
+    batch.push(p);
+    if (batch.length >= 5) {
+      return Promise.all(batch.splice(0));
+    }
+    return Promise.resolve();
+  };
+  for (const c of counties) {
+    // Ensure 3-digit county code for eBird region
+    const region = `US-CT-${c.county_fips.slice(2).padStart(3, '0')}`;
+    for (const s of speciesList) {
+      // Queue up to 5 concurrent requests
+      push(
+        avgHist(s.species_code, region).then((pct) => {
+          rows.push({ species_code: s.species_code, county_fips: c.county_fips, pct });
+        })
+      );
+    }
+  }
+  await Promise.all(batch);
+
+  // 3) Compute percentiles by county
+  const byCounty: Record<string, typeof rows> = {} as any;
+  for (const r of rows) {
+    (byCounty[r.county_fips] ||= []).push(r);
+  }
+  const upserts: { species_code: string; county_fips: string; pct_lists: number; percentile: number }[] = [];
+  for (const [fips, arr] of Object.entries(byCounty)) {
+    const sorted = arr.sort((a, b) => a.pct - b.pct);
+    sorted.forEach((r, i) => {
+      upserts.push({
+        species_code: r.species_code,
+        county_fips: fips,
+        pct_lists: r.pct * 100,
+        percentile: (i / (sorted.length - 1)) * 100,
+      });
+    });
+  }
+
+  // 4) Upsert frequency table
+  const { error: upErr } = await supa.from('checklist_freq').upsert(upserts);
+  if (upErr) {
+    return NextResponse.json({ error: 'Upsert failed', details: upErr }, { status: 500 });
+  }
+  return NextResponse.json({ inserted: upserts.length });
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\actions.ts
+"use server";
+import OpenAI from "openai";
+import { Buffer } from "buffer";
+import { getTier } from "@/lib/tier";
+
+export async function analyze(
+  file: File,
+  pos?: GeolocationPosition
+): Promise<{ species: string; tier: string }> {
+  // Convert image to base64
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+  // Identify species via OpenAI Vision (single user message with image)
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Identify the bird species in the image." },
+        { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64}` } }
+      ]
+    }
+  ];
+  // Note: casting to any to accommodate Vision chat message format
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    max_tokens: 30,
+    messages: messages as any,
+  });
+  const species = completion.choices[0].message?.content?.trim() ?? "Unknown";
+
+  // Prepare location data
+  const loc = pos?.coords
+    ? { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
+    : undefined;
+
+  // Lookup rarity tier
+  const tier = await getTier(species, loc);
+
+  return { species, tier };
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\page.tsx
+"use client";
+import { useState } from "react";
+import { analyze } from "./actions";
+
+export default function CapturePage() {
+  const [file, setFile] = useState<File>();
+  const [res, setRes] = useState<{ species: string; tier: string } | null>(null);
+
+  async function run() {
+    if (!file) return;
+    const pos = await new Promise<GeolocationPosition | undefined>((ok) =>
+      navigator.geolocation.getCurrentPosition(ok, () => ok(undefined), {
+        maximumAge: 6e5,
+        timeout: 5e3,
+      })
+    );
+    setRes(await analyze(file, pos));
+  }
+
+  return (
+    <main className="flex flex-col gap-5 p-6">
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={(e) => setFile(e.target.files?.[0])}
+        className="mb-4"
+      />
+      <button
+        onClick={run}
+        disabled={!file}
+        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Identify!
+      </button>
+
+      {res && (
+        <section className="bg-white dark:bg-gray-800 rounded shadow p-4 text-center mt-6">
+          <h2 className="text-2xl font-semibold">{res.species}</h2>
+          <p className="mt-1">
+            Tier <span className="font-bold">{res.tier}</span>
+          </p>
+        </section>
+      )}
+    </main>
+  );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\Nav.tsx
+"use client";
+import Link from "next/link";
+import { Toaster } from "react-hot-toast";
+
+export default function Nav() {
+  return (
+    <>
+      <header className="p-4 bg-white dark:bg-gray-900 shadow">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/" className="text-xl font-bold">
+            Bird Gacha
+          </Link>
+          <nav>
+            <Link
+              href="/capture"
+              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Capture
+            </Link>
+          </nav>
+        </div>
+      </header>
+      <Toaster />
+    </>
+  );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\supabase.ts
+// ‼ never import this module in client-side code (contains Service Role key)
+import { createClient } from '@supabase/supabase-js';
+
+// Use Service Role key for server-side operations
+export const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { global: { fetch } }
+);
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\tier.ts
+import { supabase } from '@/lib/supabase';
+// ‼ Simple in-memory cache for getTier (avoid N+1 queries within a request)
+const tierCache = new Map<string, string>();
+
+/**
+ * Given a bird species name and optional location, returns its rarity tier.
+ */
+export async function getTier(
+  species: string,
+  loc?: { latitude: number; longitude: number }
+): Promise<string> {
+  // Clean descriptors (e.g., "male", "female", "immature") from GPT output
+  const cleanName = species.replace(/^(male|female|immature)\s+/i, '');
+  // Determine county FIPS (default to New Haven '09009')
+  let county = '09009';
+  if (loc) {
+    const { data: counties, error: ctErr } = await supabase
+      .from('county')
+      .select('county_fips, lat, lon');
+    if (counties && counties.length > 0) {
+      let nearest = counties[0];
+      let minDist = Infinity;
+      for (const c of counties) {
+        const d2 = (c.lat - loc.latitude) ** 2 + (c.lon - loc.longitude) ** 2;
+        if (d2 < minDist) {
+          minDist = d2;
+          nearest = c;
+        }
+      }
+      county = nearest.county_fips;
+    }
+  }
+  // Cache key to memoize within a request
+  const cacheKey = `${cleanName.toLowerCase()}|${county}`;
+  if (tierCache.has(cacheKey)) {
+    return tierCache.get(cacheKey)!;
+  }
+  // Map species common name to species_code
+  const { data: sp, error: spErr } = await supabase
+    .from('species')
+    .select('species_code')
+    .ilike('com_name', cleanName)
+    .limit(1)
+    .single();
+  const code = sp?.species_code ?? 'unknown';
+  // Lookup frequency percentile
+  const { data: freq, error: freqErr } = await supabase
+    .from('checklist_freq')
+    .select('percentile')
+    .eq('species_code', code)
+    .eq('county_fips', county)
+    .single();
+  const p = freq?.percentile ?? 100;
+  // Map percentile to rarity tier
+  let tier: string;
+  if (p < 0.1) tier = 'S';
+  else if (p < 1) tier = 'A';
+  else if (p < 5) tier = 'B';
+  else if (p < 20) tier = 'C';
+  else tier = 'D';
+  tierCache.set(cacheKey, tier);
+  return tier;
+}

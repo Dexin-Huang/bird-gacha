@@ -1,0 +1,5 @@
+{
+  "cron": [
+    { "path": "/api/cron-sync-ebird", "schedule": "0 4 * * *" }
+  ]
+}
