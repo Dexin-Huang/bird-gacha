@@ -1,195 +1,21 @@
-/* src/app/globals.css */
+@import '@/styles/theme.css'; /* src/app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --background: #ffffff;
-    --foreground: #171717;
+/* Import our theme CSS */
 
-    /* Tier Colors */
-    --tier-S-bg: linear-gradient(135deg, #9333ea, #ec4899);
-    --tier-S-text: #331067;
-    --tier-S-border: #d8b4fe;
-
-    --tier-A-bg: linear-gradient(135deg, #dc2626, #f97316);
-    --tier-A-text: #7f1d1d;
-    --tier-A-border: #fca5a5;
-
-    --tier-B-bg: linear-gradient(135deg, #eab308, #f59e0b);
-    --tier-B-text: #78350f;
-    --tier-B-border: #fef08a;
-
-    --tier-C-bg: linear-gradient(135deg, #3b82f6, #0ea5e9);
-    --tier-C-text: #1e3a8a;
-    --tier-C-border: #bfdbfe;
-
-    --tier-D-bg: linear-gradient(135deg, #9ca3af, #6b7280);
-    --tier-D-text: #374151;
-    --tier-D-border: #e5e7eb;
-
-    --tier-unknown-bg: linear-gradient(135deg, #4b5563, #6b7280);
-    --tier-unknown-text: #f3f4f6;
-    --tier-unknown-border: #9ca3af;
-
-    /* Gacha Pull Animation Colors */
-    --pull-anim-bg: rgba(0, 0, 0, 0.8);
-    --pull-anim-color1: #f472b6;
-    --pull-anim-color2: #a78bfa;
-    --pull-anim-color3: #38bdf8;
-    --pull-anim-color4: #4ade80;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-
-        /* Dark Theme Tier Colors */
-        --tier-S-text: #e9d5ff;
-        --tier-S-border: #7e22ce;
-
-        --tier-A-text: #fecaca;
-        --tier-A-border: #b91c1c;
-
-        --tier-B-text: #fef9c3;
-        --tier-B-border: #ca8a04;
-
-        --tier-C-text: #dbeafe;
-        --tier-C-border: #1d4ed8;
-
-        --tier-D-text: #f3f4f6;
-        --tier-D-border: #4b5563;
-
-        --tier-unknown-bg: #222222;
-        --tier-unknown-text: #cccccc;
-
-        /* Dark Theme Pull Animation */
-        --pull-anim-bg: rgba(0, 0, 0, 0.9);
-    }
-}
-
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont);
-    overflow-y: scroll;
-}
-
-/* Animations */
-@keyframes spin-colors {
-    0% {
-        transform: rotate(0deg);
-        border-color: var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4);
-    }
-    25% {
-        border-color: var(--pull-anim-color4) var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3);
-    }
-    50% {
-        transform: rotate(180deg);
-        border-color: var(--pull-anim-color3) var(--pull-anim-color4) var(--pull-anim-color1) var(--pull-anim-color2);
-    }
-    75% {
-        border-color: var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4) var(--pull-anim-color1);
-    }
-    100% {
-        transform: rotate(360deg);
-        border-color: var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4);
-    }
-}
-
-@keyframes pulse-glow {
-    0%, 100% {
-        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.3);
-        opacity: 0.8;
-    }
-    50% {
-        box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.5);
-        opacity: 1;
-    }
-}
-
-@keyframes float {
-    0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
-    100% { transform: translateY(0) rotate(0deg); }
-}
-
-@keyframes float-alt {
-    0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(10px) rotate(-5deg); }
-    100% { transform: translateY(0) rotate(0deg); }
-}
-
-@keyframes shine {
-    0% { opacity: 0; transform: translateX(-100%); }
-    50% { opacity: 0.5; }
-    100% { opacity: 0; transform: translateX(100%); }
-}
-
-@keyframes glow {
-    0%, 100% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); }
-    50% { text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.7); }
-}
-
-@keyframes fall {
-    0% { transform: translateY(-10vh) rotate(0deg); }
-    100% { transform: translateY(110vh) rotate(720deg); }
-}
-
-@keyframes bounce-small {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+/* Key animations that existing components might rely on */
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes reveal {
-    from {
-        opacity: 0;
-        transform: scale(0.8) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Utility Classes */
-.gacha-pull-spinner {
-    width: 80px;
-    height: 80px;
-    border: 8px solid transparent;
-    border-radius: 50%;
-    animation: spin-colors 1.5s linear infinite;
-}
-
-.gacha-pull-container {
-    background-color: var(--pull-anim-bg);
-}
-
-.animate-shine {
-    animation: shine 2s infinite;
-}
-
-.animate-glow {
-    animation: glow 2s infinite;
-}
-
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
-
-.animate-float-alt {
-    animation: float-alt 7s ease-in-out infinite;
-}
-
-.animate-fall {
-    animation: fall 3s linear forwards;
-}
-
-.animate-bounce-small {
-    animation: bounce-small 2s infinite;
-}
-
+/* Utility classes specifically needed by existing components */
 .results-reveal {
     animation: reveal 0.5s ease-out forwards;
 }
@@ -198,132 +24,26 @@ body {
     transform: rotateY(180deg);
 }
 
-/* Tier Classes */
-.tier-S {
-    background: var(--tier-S-bg);
-    color: var(--tier-S-text);
+/* Scrollbar styling */
+.max-h-\[60vh\]::-webkit-scrollbar {
+    width: 6px;
+}
+.max-h-\[60vh\]::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+.max-h-\[60vh\]::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+.max-h-\[60vh\]::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
-.tier-A {
-    background: var(--tier-A-bg);
-    color: var(--tier-A-text);
-}
-
-.tier-B {
-    background: var(--tier-B-bg);
-    color: var(--tier-B-text);
-}
-
-.tier-C {
-    background: var(--tier-C-bg);
-    color: var(--tier-C-text);
-}
-
-.tier-D {
-    background: var(--tier-D-bg);
-    color: var(--tier-D-text);
-}
-
-.tier-unknown {
-    background: var(--tier-unknown-bg);
-    color: var(--tier-unknown-text);
-}
-
-/* Additional Hover Effects */
-.hover-scale {
-    transition: transform 0.3s ease;
-}
-
-.hover-scale:hover {
-    transform: scale(1.05);
-}
-
-.hover-scale:active {
-    transform: scale(0.98);
-}
-
-/* Card Styles */
-.card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300;
-}
-
-.card-hover {
-    @apply hover:shadow-xl transform hover:scale-105 transition-all duration-300;
-}
-
-/* Mobile Optimizations */
-@media (max-width: 640px) {
-    .mobile-btn {
-        @apply py-4 px-6 text-lg rounded-xl w-full;
-    }
-
-    .mobile-card {
-        @apply rounded-lg shadow-md;
-    }
-
-    .mobile-header {
-        @apply text-xl p-4;
-    }
-}
-
-/* Gacha Result Animations */
-.result-badge {
-    position: relative;
-    overflow: hidden;
-}
-
-.result-badge::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent 30%
-    );
-    animation: rotate-shine 3s linear infinite;
-}
-
-@keyframes rotate-shine {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Special effect for S tier */
-.tier-S-special {
-    position: relative;
-}
-
-.tier-S-special::before {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    background: linear-gradient(90deg, #f472b6, #a78bfa, #38bdf8, #f472b6);
-    background-size: 400% 100%;
-    border-radius: 50%;
-    animation: gradient-border 3s ease infinite;
-    z-index: -1;
-}
-.tier-X {
-    background: var(--tier-unknown-bg);
-    color: var(--tier-unknown-text);
-}
-
-@keyframes gradient-border {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+/* Default body styles */
+body {
+    background: var(--page-background);
+    color: var(--text-primary);
+    font-family: var(--font-geist-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont);
+    overflow-y: scroll;
 }

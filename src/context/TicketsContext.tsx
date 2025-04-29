@@ -1,4 +1,8 @@
+/* ------------------------------------------------------------------
+   TicketsContext – server-authoritative tickets & daily reward
+   ------------------------------------------------------------------ */
 "use client";
+
 import React, {
   createContext,
   useContext,
@@ -7,82 +11,78 @@ import React, {
   useCallback,
 } from "react";
 
-/* ---------------- Types ---------------- */
+/* ---------- Public shape ---------- */
 interface TicketsContextValue {
-  /** current ticket count */
+  /** current ticket balance */
   tickets: number;
-  /** supports functional updates */
+  /** functional updates allowed */
   setTickets: React.Dispatch<React.SetStateAction<number>>;
-  /** returns true if reward granted */
-  claimDailyReward: () => boolean;
-  /** ms until next reward (0 if ready) */
-  timeUntilNextReward: () => number;
+  /** POST /api/tickets → true if reward granted */
+  claimDailyReward: () => Promise<boolean>;
+  /** ms until next reward - null while booting */
+  timeUntilNextReward: () => number | null;
 }
 
-/* ------------- Context --------------- */
+/* ---------- Context / hook ---------- */
 const TicketsContext = createContext<TicketsContextValue | undefined>(
   undefined,
 );
 
-/* ------------- Hook ------------------ */
 export const useTickets = () => {
   const ctx = useContext(TicketsContext);
-  if (!ctx) throw new Error("useTickets must be inside <TicketsProvider />");
+  if (!ctx) throw new Error("useTickets must be inside <TicketsProvider>");
   return ctx;
 };
 
-/* ------------- Provider -------------- */
+/* ---------- Provider ---------- */
 export const TicketsProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [tickets, setTickets] = useState(0);
-  const [lastRewardISO, setLastRewardISO] = useState<string | null>(null);
+  const [tickets, setTickets]         = useState(0);
+  const [lastRewardISO, setLastISO]   = useState<string | null>(null);
+  const [booted, setBooted]           = useState(false);
 
-  /* initialise from localStorage ------------------ */
+  /* ----- initial fetch ----- */
   useEffect(() => {
-    const stored = Number(localStorage.getItem("tickets"));
-    setTickets(Number.isFinite(stored) ? stored : 10);
-
-    const last = localStorage.getItem("lastRewardDate");
-    if (last) setLastRewardISO(last);
+    (async () => {
+      try {
+        const res  = await fetch("/api/tickets", { cache: "no-store" });
+        const json = await res.json();
+        setTickets(json.tickets ?? 0);
+        if (json.lastRewardISO) setLastISO(json.lastRewardISO);
+      } catch {
+        // very first visit or network offline
+        setTickets(10);
+      } finally {
+        setBooted(true);
+      }
+    })();
   }, []);
 
-  /* persist tickets ------------------------------- */
-  useEffect(() => {
-    localStorage.setItem("tickets", tickets.toString());
-  }, [tickets]);
+  /* ----- claim reward ----- */
+  const claimDailyReward = useCallback(async () => {
+    try {
+      const res  = await fetch("/api/tickets", { method: "POST" });
+      if (!res.ok) return false;
 
-  /* persist last reward --------------------------- */
-  useEffect(() => {
-    if (lastRewardISO) localStorage.setItem("lastRewardDate", lastRewardISO);
-  }, [lastRewardISO]);
+      const { tickets: newBal, granted, lastRewardISO: ts } = await res.json();
+      setTickets(newBal);
+      if (granted && ts) setLastISO(ts);
+      return granted;
+    } catch {
+      return false;
+    }
+  }, []);
 
-  /* helpers --------------------------------------- */
-  const canClaimToday = useCallback(() => {
-    if (!lastRewardISO) return true;
+  /* ----- countdown helper ----- */
+  const timeUntilNextReward = useCallback((): number | null => {
+    if (!booted) return null;                 // not ready yet
+    if (!lastRewardISO) return 0;             // never claimed
     const last = new Date(lastRewardISO);
-    const now = new Date();
-    return (
-      last.getFullYear() !== now.getFullYear() ||
-      last.getMonth() !== now.getMonth() ||
-      last.getDate() !== now.getDate()
-    );
-  }, [lastRewardISO]);
-
-  const claimDailyReward = () => {
-    if (!canClaimToday()) return false;
-    setTickets((t) => t + 5);
-    setLastRewardISO(new Date().toISOString());
-    return true;
-  };
-
-  const timeUntilNextReward = () => {
-    if (canClaimToday()) return 0;
-    const now = new Date();
-    const nextMidnight = new Date(now);
-    nextMidnight.setHours(24, 0, 0, 0);
-    return nextMidnight.getTime() - now.getTime();
-  };
+    const next = new Date(last);
+    next.setDate(last.getDate() + 1);
+    return Math.max(0, next.getTime() - Date.now());
+  }, [lastRewardISO, booted]);
 
   return (
     <TicketsContext.Provider
@@ -93,5 +93,4 @@ export const TicketsProvider: React.FC<React.PropsWithChildren> = ({
   );
 };
 
-/* ------------- default export -------- */
 export default TicketsContext;

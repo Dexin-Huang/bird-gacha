@@ -1,160 +1,128 @@
+// src/app/capture/actions.ts
 "use server";
 
-/* ------------------------------------------------------------------
-   Photo → local-rarity tier
-   • model only sees species *codes* valid in the user's state
-   • no global counts anywhere
-------------------------------------------------------------------- */
+import OpenAI                       from "openai";
+import { Buffer }                   from "buffer";
+import { createClient }             from "@supabase/supabase-js";
+import { getAnonId }                from "@/lib/anonId";
+import { toTier }                   from "@/lib/tier";        // absolute-count helper
 
-import OpenAI from "openai";
-import { Buffer } from "buffer";
-import { createClient } from "@supabase/supabase-js";
-
-/* ── constants & tuning ────────────────────────────────────────── */
-const MODEL = "gpt-4o" as const; // Updated to use GPT-4o model
-const DETAIL = "auto" as const; // Simplified to use 'auto' detail setting
-const TOKENS = 40;
-
-/* ── Supabase client ───────────────────────────────────────────── */
 const supa = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { persistSession: false }, global: { fetch } }
 );
 
-/* ── 1.  state → cached shortlist of species codes ─────────────── */
-const shortlistCache = new Map<string, { csv: string; set: Set<string> }>();
+const MODEL  = "gpt-4o";
+const DETAIL = "auto";
 
-async function getShortlist(state: string) {
-  if (shortlistCache.has(state)) return shortlistCache.get(state)!;
-
-  const { data, error } = await supa
-    .from("species_freq_state")
-    .select("species_code")
-    .eq("state", state)
-    .gt("n_local", 0);
-
-  if (error || !data) throw new Error(`Cannot load species list for ${state}`);
-
-  const codes = data.map((r) => r.species_code as string);
-  const csv = codes.join(", ");
-  const set = new Set(codes);
-
-  shortlistCache.set(state, { csv, set });
-  return { csv, set };
+/* ---------- thin helper wrappers around RPCs ------------------ */
+async function burnTicket(anon: string) {
+  const { data, error } = await supa.rpc("at_consume", { _anon: anon, _n: 1 });
+  if (error || !data) throw new Error("No tickets left.");
+}
+async function rateLimit(anon: string, route = "analyze") {
+  const { error } = await supa.rpc("at_rate", { _anon: anon, _route: route });
+  if (error) throw new Error("Slow down – too many pulls.");
+}
+async function fuzzyToCode(name: string) {
+  const { data } = await supa.rpc("fuzzy_name_to_code", { _name: name });
+  return data as string | null;
+}
+async function getLocalTier(code: string, state: string) {
+  const { data } = await supa.rpc("local_tier", { _code: code, _state: state });
+  return (data ?? "X") as string;
 }
 
-/* ── 2.  code → common name for display ───────────────────────── */
-async function code2name(code: string): Promise<string> {
-  const { data } = await supa
-    .from("species")
-    .select("com_name")
-    .eq("species_code", code)
-    .single();
+/* -------------------- identify via OpenAI --------------------- */
+async function identify(base64: string, state: string) {
+  const { csv } = await supa
+    .rpc("get_shortlist_csv", {     // **OPTIONAL** small SQL helper
+      _state: state
+    })
+    .single();                      // returns csv of species_code allowed
 
-  return data?.com_name ?? code;
-}
-
-/* ── 3. percentile‑to‑tier helper ─────────────────────────────── */
-async function localTier(
-  code: string,
-  state: string,
-  nLocal: number
-): Promise<string> {
-  if (nLocal === 0) return "X";
-
-  const { data: all } = await supa
-    .from("species_freq_state")
-    .select("species_code,n_local")
-    .eq("state", state)
-    .gt("n_local", 0);
-
-  const sorted = all!.sort((a, b) => a.n_local - b.n_local);
-  const rank = sorted.findIndex((r) => r.species_code === code);
-  const p = rank / (sorted.length - 1);
-
-  return p < 0.05
-    ? "S"
-    : p < 0.2
-    ? "A"
-    : p < 0.52
-    ? "B"
-    : p < 0.81
-    ? "C"
-    : "D";
-}
-
-/* ── 4. identify the bird, constrained to shortlist ───────────── */
-async function identify(
-  detail: "auto",
-  base64: string,
-  state: string
-): Promise<{ code: string; confidence: number }> {
-  const { csv, set } = await getShortlist(state);
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-
   const rsp = await openai.chat.completions.create({
     model: MODEL,
-    max_tokens: TOKENS,
+    max_tokens: 40,
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
         content:
-          "You are an expert birder.\n" +
-          'Return EXACTLY one JSON object: {"species_code":"code","confidence":0-1}.\n' +
-          "The species_code **must** be chosen from the provided list. " +
-          'If no living bird is visible return {"species_code":"NOT_BIRD","confidence":0-1}.',
+          'Return {"species_code":"code","common_name":"name","confidence":0-1}. ' +
+          "Use a code from the list or NOT_BIRD.",
       },
       {
         role: "user",
         content: [
-          // ① text first
-          {
-            type: "text",
-            text: `Allowed species codes:\n${csv}`,
-          },
-          // ② image second
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:image/jpeg;base64,${base64}`,
-              detail,
-            },
-          },
+          { type: "text",  text: `Allowed species codes:\n${csv}` },
+          { type: "image_url",
+            image_url: { url: `data:image/jpeg;base64,${base64}`, detail: DETAIL } }
         ],
       },
     ],
   });
 
-  try {
-    const { species_code, confidence } = JSON.parse(
-      rsp.choices[0].message.content!
-    );
-    if (!set.has(species_code)) throw new Error("model chose invalid code");
-    return { code: species_code, confidence };
-  } catch (err) {
-    throw new Error("Identify failed: " + err);
-  }
+  return JSON.parse(rsp.choices[0].message.content!);
 }
 
-/* ── 5. Public action ------------------------------------------------ */
+/* =================== PUBLIC ACTION ============================ */
 export async function analyze(file: File, state: string) {
+  const anon = getAnonId();
+
+  await rateLimit(anon);
+  await burnTicket(anon);
+
   const base64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+  const { species_code, common_name, confidence } = await identify(base64, state);
 
-  const res = await identify(DETAIL, base64, state);
+  /* ---------- NOT A BIRD ---------- */
+  if (species_code === "NOT_BIRD") {
+    return { species: "Not a bird", tier: "X", confidence };
+  }
 
-  const { data: row } = await supa
-    .from("species_freq_state")
-    .select("n_local")
-    .eq("state", state)
-    .eq("species_code", res.code)
-    .single();
+  /* ----------  happy path ---------- */
+  // check if code exists; otherwise fall back to fuzzy match
+  let code       = species_code;
+  let name       = common_name;
+  let tier       : string;
 
-  const nLocal = row?.n_local ?? 0;
-  const tier = await localTier(res.code, state, nLocal);
-  const name = await code2name(res.code);
+  const { count } = await supa
+    .from("species")
+    .select("species_code", { head: true, count: "exact" })
+    .eq("species_code", code);
 
-  return { species: name, tier };
+  if ((count ?? 0) === 0) {                         // hallucinated code
+    const resolved = await fuzzyToCode(common_name);
+    if (!resolved) {
+      return { species: common_name ?? "Unknown", tier: "X", confidence };
+    }
+    code = resolved;
+  }
+
+  /* tier – local first, else global absolute */
+  tier = await getLocalTier(code, state);
+  if (tier === "X") {
+    const { data } = await supa
+      .from("species")
+      .select("n_records")
+      .eq("species_code", code)
+      .single();
+    tier = toTier(data?.n_records ?? 0);
+  }
+
+  /* friendly name */
+  if (!name) {
+    const { data } = await supa
+      .from("species")
+      .select("com_name")
+      .eq("species_code", code)
+      .single();
+    name = data?.com_name ?? code;
+  }
+
+  return { species: name, tier, confidence };
 }
