@@ -1,273 +1,2295 @@
 File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\globals.css
-@import "tailwindcss";
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+    --background: #ffffff;
+    --foreground: #171717;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+    /* Tier Colors */
+    --tier-S-bg: linear-gradient(135deg, #9333ea, #ec4899);
+    --tier-S-text: #331067;
+    --tier-S-border: #d8b4fe;
+
+    --tier-A-bg: linear-gradient(135deg, #dc2626, #f97316);
+    --tier-A-text: #7f1d1d;
+    --tier-A-border: #fca5a5;
+
+    --tier-B-bg: linear-gradient(135deg, #eab308, #f59e0b);
+    --tier-B-text: #78350f;
+    --tier-B-border: #fef08a;
+
+    --tier-C-bg: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    --tier-C-text: #1e3a8a;
+    --tier-C-border: #bfdbfe;
+
+    --tier-D-bg: linear-gradient(135deg, #9ca3af, #6b7280);
+    --tier-D-text: #374151;
+    --tier-D-border: #e5e7eb;
+
+    --tier-unknown-bg: linear-gradient(135deg, #4b5563, #6b7280);
+    --tier-unknown-text: #f3f4f6;
+    --tier-unknown-border: #9ca3af;
+
+    /* Gacha Pull Animation Colors */
+    --pull-anim-bg: rgba(0, 0, 0, 0.8);
+    --pull-anim-color1: #f472b6;
+    --pull-anim-color2: #a78bfa;
+    --pull-anim-color3: #38bdf8;
+    --pull-anim-color4: #4ade80;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+
+        /* Dark Theme Tier Colors */
+        --tier-S-text: #e9d5ff;
+        --tier-S-border: #7e22ce;
+
+        --tier-A-text: #fecaca;
+        --tier-A-border: #b91c1c;
+
+        --tier-B-text: #fef9c3;
+        --tier-B-border: #ca8a04;
+
+        --tier-C-text: #dbeafe;
+        --tier-C-border: #1d4ed8;
+
+        --tier-D-text: #f3f4f6;
+        --tier-D-border: #4b5563;
+
+        --tier-unknown-bg: #222222;
+        --tier-unknown-text: #cccccc;
+
+        /* Dark Theme Pull Animation */
+        --pull-anim-bg: rgba(0, 0, 0, 0.9);
+    }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont);
+    overflow-y: scroll;
 }
 
+/* Animations */
+@keyframes spin-colors {
+    0% {
+        transform: rotate(0deg);
+        border-color: var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4);
+    }
+    25% {
+        border-color: var(--pull-anim-color4) var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3);
+    }
+    50% {
+        transform: rotate(180deg);
+        border-color: var(--pull-anim-color3) var(--pull-anim-color4) var(--pull-anim-color1) var(--pull-anim-color2);
+    }
+    75% {
+        border-color: var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4) var(--pull-anim-color1);
+    }
+    100% {
+        transform: rotate(360deg);
+        border-color: var(--pull-anim-color1) var(--pull-anim-color2) var(--pull-anim-color3) var(--pull-anim-color4);
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.3);
+        opacity: 0.8;
+    }
+    50% {
+        box-shadow: 0 0 25px 15px rgba(255, 255, 255, 0.5);
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes float-alt {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(10px) rotate(-5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes shine {
+    0% { opacity: 0; transform: translateX(-100%); }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); }
+    50% { text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.7); }
+}
+
+@keyframes fall {
+    0% { transform: translateY(-10vh) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(720deg); }
+}
+
+@keyframes bounce-small {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Utility Classes */
+.gacha-pull-spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid transparent;
+    border-radius: 50%;
+    animation: spin-colors 1.5s linear infinite;
+}
+
+.gacha-pull-container {
+    background-color: var(--pull-anim-bg);
+}
+
+.animate-shine {
+    animation: shine 2s infinite;
+}
+
+.animate-glow {
+    animation: glow 2s infinite;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-alt {
+    animation: float-alt 7s ease-in-out infinite;
+}
+
+.animate-fall {
+    animation: fall 3s linear forwards;
+}
+
+.animate-bounce-small {
+    animation: bounce-small 2s infinite;
+}
+
+.results-reveal {
+    animation: reveal 0.5s ease-out forwards;
+}
+
+.rotate-y-180 {
+    transform: rotateY(180deg);
+}
+
+/* Tier Classes */
+.tier-S {
+    background: var(--tier-S-bg);
+    color: var(--tier-S-text);
+}
+
+.tier-A {
+    background: var(--tier-A-bg);
+    color: var(--tier-A-text);
+}
+
+.tier-B {
+    background: var(--tier-B-bg);
+    color: var(--tier-B-text);
+}
+
+.tier-C {
+    background: var(--tier-C-bg);
+    color: var(--tier-C-text);
+}
+
+.tier-D {
+    background: var(--tier-D-bg);
+    color: var(--tier-D-text);
+}
+
+.tier-unknown {
+    background: var(--tier-unknown-bg);
+    color: var(--tier-unknown-text);
+}
+
+/* Additional Hover Effects */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.hover-scale:active {
+    transform: scale(0.98);
+}
+
+/* Card Styles */
+.card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300;
+}
+
+.card-hover {
+    @apply hover:shadow-xl transform hover:scale-105 transition-all duration-300;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+    .mobile-btn {
+        @apply py-4 px-6 text-lg rounded-xl w-full;
+    }
+
+    .mobile-card {
+        @apply rounded-lg shadow-md;
+    }
+
+    .mobile-header {
+        @apply text-xl p-4;
+    }
+}
+
+/* Gacha Result Animations */
+.result-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.result-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent 30%
+    );
+    animation: rotate-shine 3s linear infinite;
+}
+
+@keyframes rotate-shine {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Special effect for S tier */
+.tier-S-special {
+    position: relative;
+}
+
+.tier-S-special::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    background: linear-gradient(90deg, #f472b6, #a78bfa, #38bdf8, #f472b6);
+    background-size: 400% 100%;
+    border-radius: 50%;
+    animation: gradient-border 3s ease infinite;
+    z-index: -1;
+}
+.tier-X {
+    background: var(--tier-unknown-bg);
+    color: var(--tier-unknown-text);
+}
+
+@keyframes gradient-border {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
 File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\layout.tsx
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// src/app/layout.tsx
+import type {Metadata, Viewport} from "next";
+import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/Nav";
+import TicketsProvider from "@/context/TicketsContext";
+import CollectionProvider from "@/context/CollectionContext";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Bird Gacha",
-  description: "Identify and tier birds with AI",
-  colorScheme: "light dark",
+    title: "Bird Gacha",
+    description: "Identify and collect birds with AI",
+    // Remove colorScheme from here
+};
+export const viewport: Viewport = {
+    colorScheme: "light dark", // Move this here
+    width: "device-width",
+    initialScale: 1,
+};
+export default function RootLayout({
+                                       children,
+                                   }: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <html lang="en">
+        <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+        <TicketsProvider>
+            <CollectionProvider>
+                {children}
+            </CollectionProvider>
+        </TicketsProvider>
+        </body>
+        </html>
+    );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\page.tsx
+// src/app/page.tsx - Polished Bird Gacha Homepage (Dark Theme - Final Tweaks)
+"use client";
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import { Star, Sparkles, BookOpen, Info, Target, X, Camera } from 'lucide-react';
+import { useTickets } from '@/context/TicketsContext';
+
+// --- Configuration ---
+
+// Using S-D tiers, updated percentages, styles from the preferred dark theme version
+const tierConfig = {
+  'S': {
+    name: "LEGENDARY",
+    rarity: "5.0%", // Updated percentage
+    color: "text-yellow-400",
+    bgGradient: "from-yellow-400/80 via-amber-300/80 to-yellow-500/80",
+    glow: "shadow-[0_0_15px_5px_rgba(250,204,21,0.5)]",
+    stars: 5,
+  },
+  'A': {
+    name: "EPIC",
+    rarity: "14.8%", // Updated percentage
+    color: "text-purple-400",
+    bgGradient: "from-purple-500/80 via-fuchsia-500/80 to-purple-600/80",
+    glow: "shadow-[0_0_12px_4px_rgba(192,132,252,0.5)]",
+    stars: 4,
+  },
+  'B': {
+    name: "RARE",
+    rarity: "31.9%", // Updated percentage
+    color: "text-blue-400",
+    bgGradient: "from-blue-500/80 via-cyan-500/80 to-blue-600/80",
+    glow: "shadow-[0_0_10px_3px_rgba(96,165,250,0.4)]",
+    stars: 3,
+  },
+  'C': {
+    name: "UNCOMMON",
+    rarity: "29.3%", // Updated percentage
+    color: "text-emerald-400",
+    bgGradient: "from-emerald-500/80 via-green-500/80 to-emerald-600/80",
+    glow: "shadow-[0_0_8px_2px_rgba(52,211,153,0.4)]",
+    stars: 2
+  },
+  'D': {
+    name: "COMMON",
+    rarity: "18.9%", // Updated percentage
+    color: "text-gray-400",
+    bgGradient: "from-gray-500/80 via-slate-500/80 to-gray-600/80",
+    glow: "shadow-[0_0_6px_1px_rgba(156,163,175,0.4)]",
+    stars: 1
+  }
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Nav />
-        {children}
-      </body>
-    </html>
-  );
-}
+type TierLevel = keyof typeof tierConfig;
 
-File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\page.tsx
-export default function Home() {
+// --- Helper Components ---
+
+// Keeping the Genshin-inspired Ticket Icon
+const TicketIcon = ({ size = 16, className = "" }: { size?: number, className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-gem ${className}`}>
+      <path d="M6 3h12l4 6-10 13L2 9z"/>
+      <path d="M12 22V9"/>
+      <path d="m3.29 9 8.71 13 8.71-13"/>
+      <path d="M2 9h20"/>
+    </svg>
+);
+
+// TierStars component (using the logic from the preferred dark version)
+const TierStars = ({ tier, size = 16 }: { tier: TierLevel, size?: number }) => {
+    const config = tierConfig[tier];
+    if (!config) return null;
+    const starCount = config.stars;
+    const starColor = config.color || "text-yellow-400";
+
+    return (
+        <div className="flex gap-[2px]">
+            {[...Array(5)].map((_, i) => (
+                <Star
+                    key={i}
+                    size={size}
+                    fill={i < starCount ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    className={i < starCount ? starColor : "text-gray-600"} // Dark theme unfilled star
+                />
+            ))}
+        </div>
+    );
+};
+
+
+// --- Main Page Component ---
+
+export default function HomePage() {
+  const { tickets = 0 } = useTickets() ?? { tickets: 0 };
+  const [showRarityGuide, setShowRarityGuide] = useState(false);
+  const [animateButton, setAnimateButton] = useState(false);
+
+  // Memoized background elements (Reverted to Dark Theme)
+  const backgroundElements = useMemo(() => {
+     const stars = Array.from({ length: 50 }).map((_, i) => {
+       const size = Math.random() * 2 + 1;
+       const duration = Math.random() * 50 + 30;
+       const delay = Math.random() * 30;
+       const opacity = Math.random() * 0.5 + 0.2;
+       return { key: `star-${i}`, style: { left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`, width: `${size}px`, height: `${size}px`, opacity: opacity, animation: `drift ${duration}s linear ${delay}s infinite alternate` }, className: "absolute rounded-full bg-white/80" };
+     });
+     const sparkles = Array.from({ length: 15 }).map((_, i) => {
+       const size = Math.random() * 10 + 6;
+       const duration = Math.random() * 5 + 3;
+       const delay = Math.random() * 5;
+       const opacity = Math.random() * 0.6 + 0.3;
+       return { key: `sparkle-${i}`, style: { left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`, opacity: opacity, animation: `pulse ${duration}s ease-in-out ${delay}s infinite` }, className: "absolute text-yellow-300", size: size };
+     });
+     return { stars, sparkles };
+   }, []);
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimateButton(true), 100);
+    const interval = setInterval(() => {
+        setAnimateButton(false);
+        setTimeout(() => setAnimateButton(true), 100);
+    }, 5000);
+    return () => { clearTimeout(timer); clearInterval(interval); };
+  }, []);
+
+  const sortedTiers = useMemo(() => ['S', 'A', 'B', 'C', 'D'] as TierLevel[], []);
+
   return (
-    <main className="prose mx-auto p-6">
-      <h1 className="text-4xl font-bold mb-4">Bird Gacha</h1>
-      <p>Upload a photo of a bird, get its species and rarity tier based on your location.</p>
-      <h2 className="mt-6 text-2xl font-semibold">How it works</h2>
-      <ol className="list-decimal list-inside mt-4 space-y-2">
-        <li>Capture or upload a bird photo</li>
-        <li>Identify the species using AI</li>
-        <li>Lookup its rarity in your county</li>
-        <li>Receive a tier: S (super rare) to D (common)</li>
-      </ol>
-      <div className="mt-6">
-        <a href="/capture" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Start capturing &rarr;
-        </a>
+    // Reverted to Dark Theme Background Gradient
+    <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-indigo-900 via-blue-900 to-black text-gray-100 font-sans overflow-hidden">
+
+      {/* Animated Background - Reverted to Dark Theme */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Drifting Stars */}
+        {backgroundElements.stars.map(star => <div key={star.key} style={star.style} className={star.className} />)}
+        {/* Pulsing Sparkles */}
+        {backgroundElements.sparkles.map(sparkle => <div key={sparkle.key} style={sparkle.style} className={sparkle.className}><Sparkles size={sparkle.size} fill="currentColor" /></div>)}
+        {/* Subtle Gradient Glows (Dark Theme) */}
+        <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] bg-gradient-radial from-blue-500/15 via-transparent to-transparent rounded-full animate-subtle-pulse opacity-50 blur-3xl"></div>
+        <div className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vw] bg-gradient-radial from-purple-500/15 via-transparent to-transparent rounded-full animate-subtle-pulse animation-delay-2s opacity-50 blur-3xl"></div>
+        {/* Central Glow (Dark Theme - Amber/Orange) */}
+        <div className="absolute inset-0 flex items-center justify-center">
+             <div className="w-96 h-96 bg-gradient-radial from-amber-400/10 via-orange-300/5 to-transparent rounded-full blur-3xl animate-pulse-slow"></div>
+         </div>
       </div>
-    </main>
+
+      {/* Header - Reverted to Dark Theme Style */}
+       <header className="pt-5 pb-3 px-4 flex justify-between items-center z-10 relative w-full">
+         {/* Prominent Title - Keeping the existing dark theme style */}
+         <div className="flex-grow text-center absolute inset-x-0 top-4">
+             <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-300 to-orange-400 drop-shadow-lg">
+                 Bird Gacha
+             </h1>
+         </div>
+         {/* Ticket Counter - Reverted to Dark Theme Style */}
+         <div className="ml-auto bg-black/40 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg relative">
+             <TicketIcon size={20} className="text-amber-400" />
+             <span className="font-semibold text-lg text-white">{tickets}</span>
+         </div>
+       </header>
+
+
+      {/* Main Content - Centered Capture Button */}
+      <main className="flex-grow flex flex-col items-center justify-center px-4 pb-24 relative z-10 mt-8">
+        <div className="relative group">
+           {tickets > 0 ? (
+             <Link href="/capture" passHref>
+               <button
+                 className={`
+                   relative w-48 h-48 sm:w-56 sm:h-56 rounded-full
+                   bg-gradient-to-br from-yellow-400 via-amber-300 to-orange-400 /* Button gradient */
+                   border-2 border-yellow-200/50
+                   flex flex-col items-center justify-center text-center
+                   text-white font-bold shadow-xl /* <<<< CHANGED TEXT TO WHITE */
+                   transition-all duration-300 ease-out
+                   hover:scale-105 hover:shadow-[0_0_25px_8px_rgba(250,204,21,0.6)]
+                   active:scale-95 active:shadow-[0_0_15px_5px_rgba(250,204,21,0.5)]
+                   ${animateButton ? 'scale-100 shadow-[0_0_20px_7px_rgba(250,204,21,0.5)]' : 'scale-95 shadow-lg shadow-yellow-500/30'}
+                 `}
+               >
+                 <div className="absolute inset-0 rounded-full bg-gradient-radial from-white/30 via-transparent to-transparent opacity-50 group-hover:opacity-80 transition-opacity"></div>
+                 <div className={`absolute -inset-2 rounded-full border-2 border-yellow-300/50 animate-pulse-slow ${animateButton ? 'opacity-75' : 'opacity-0'} transition-opacity duration-500`}></div>
+
+                 {/* Icon and Text - WHITE TEXT */}
+                 <Camera size={40} className="mb-1 text-white drop-shadow-md" /> {/* White icon */ }
+                 <span className="text-xl sm:text-2xl text-white drop-shadow-md leading-tight">CAPTURE</span> {/* White Text */}
+                 <span className="text-xs sm:text-sm text-white/80 drop-shadow-md leading-tight mt-1">Pull for birds!</span> {/* Muted White Text */}
+
+                 {/* Cost Indicator - Dark Theme Style */}
+                 <div className="absolute bottom-3 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 border border-white/20">
+                    <TicketIcon size={14} className="text-amber-300"/>
+                    <span className="text-xs text-white font-medium">1</span>
+                 </div>
+               </button>
+             </Link>
+           ) : (
+             // Disabled State - Adjusted for Dark Theme + White Active Text
+             <div
+               className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-br from-gray-600 via-gray-500 to-gray-600 border-2 border-gray-400/50 flex flex-col items-center justify-center text-center text-gray-500 font-bold shadow-lg cursor-not-allowed opacity-70" /* Darker text color */
+             >
+               <Camera size={40} className="mb-1 text-gray-500" /> {/* Muted icon */}
+               <span className="text-xl sm:text-2xl text-gray-500 leading-tight">CAPTURE</span> {/* Muted Text */}
+                <span className="text-xs sm:text-sm text-gray-600/90 leading-tight mt-1">Pull for birds!</span> {/* Muted Text */}
+               <div className="absolute bottom-3 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 border border-white/20">
+                 <TicketIcon size={14} className="text-gray-400"/>
+                 <span className="text-xs text-gray-300 font-medium">1</span>
+               </div>
+               <span className="absolute top-full mt-2 text-sm text-red-400 font-semibold">No Tickets!</span>
+             </div>
+           )}
+         </div>
+      </main>
+
+      {/* Footer Navigation - Reverted to Dark Theme Style, Link Fix Applied */}
+      <footer className="absolute bottom-0 left-0 right-0 p-3 z-10 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+        <div className="flex justify-center items-center gap-3 sm:gap-4 max-w-md mx-auto">
+          {[
+            { href: '/collection', icon: BookOpen, label: 'Collection', color: 'text-blue-300', hoverColor: 'hover:shadow-blue-400/40' },
+            { onClick: () => setShowRarityGuide(true), icon: Info, label: 'Rarity', color: 'text-purple-300', hoverColor: 'hover:shadow-purple-400/40' },
+            { href: '/bounty', icon: Target, label: 'Bounties', color: 'text-amber-300', hoverColor: 'hover:shadow-amber-400/40' },
+          ].map(({ href, onClick, icon: Icon, label, color, hoverColor }) => {
+            const buttonClasses = `
+              relative group flex flex-col items-center justify-center p-2 rounded-lg
+              bg-black/20 backdrop-blur-md border border-transparent /* Dark theme bg */
+              hover:bg-black/30 hover:border-white/10
+              transition-all duration-200 flex-1 text-center shadow-md hover:shadow-lg ${hoverColor} hover:-translate-y-1
+            `;
+            const content = (
+              <>
+                {/* Dark theme icon background */}
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center mb-1 border border-white/10 group-hover:bg-white/10 transition-colors`}>
+                   <Icon size={20} className={`${color} transition-colors`} />
+                </div>
+                {/* Dark theme text color */}
+                <span className="text-xs sm:text-sm font-medium text-gray-200">{label}</span>
+              </>
+            );
+
+            // Apply classes directly to Link, no legacyBehavior or <a>
+            return href ? (
+              <Link key={label} href={href} className={buttonClasses}>
+                {content}
+              </Link>
+             ) : (
+              <button key={label} onClick={onClick} className={buttonClasses}>
+                {content}
+              </button>
+             );
+          })}
+        </div>
+      </footer>
+
+
+      {/* Rarity Guide Modal (Using updated percentages, Reverted to Dark Theme) */}
+      {showRarityGuide && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          {/* Reverted Modal Style to Dark Theme */}
+          <div className="bg-gradient-to-b from-gray-800/80 via-gray-900/90 to-black/90 border border-blue-400/30 rounded-xl shadow-2xl w-full max-w-md overflow-hidden backdrop-blur-lg">
+            {/* Modal Header - Dark Theme */}
+            <div className="p-4 flex items-center justify-between border-b border-blue-300/20 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Info size={18} className="text-purple-300" />
+                Rarity System
+              </h3>
+              <button onClick={() => setShowRarityGuide(false)} className="rounded-full p-1.5 bg-white/10 hover:bg-white/20 text-gray-300 transition-colors"> <X size={20} /> </button>
+            </div>
+
+            {/* Modal Content - Updated Percentages */}
+            <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+              {sortedTiers.map((tier, index) => {
+                  const config = tierConfig[tier];
+                  return (
+                    // Modal Item Style - Dark Theme
+                    <div
+                      key={tier}
+                      className={`flex items-center p-3 rounded-lg bg-black/30 border border-white/10 gap-4 transition-all duration-300 hover:bg-black/40 ${config.glow} hover:scale-[1.02]`}
+                      style={{ animation: `fade-slide-in 0.5s ease-out ${index * 100}ms backwards` }}
+                    >
+                      <div className={`flex-shrink-0 w-14 h-14 rounded-md bg-gradient-to-br ${config.bgGradient} flex items-center justify-center text-white font-bold text-2xl shadow-lg border border-white/20`}>
+                          {tier}
+                      </div>
+                      <div className="flex-grow">
+                         <div className="flex justify-between items-center mb-1">
+                           <span className={`font-bold text-md ${config.color}`}>{config.name}</span>
+                           {/* Using updated rarity percentage */}
+                           <span className="text-sm text-gray-300 font-medium bg-black/40 px-2 py-0.5 rounded-full border border-white/10">{config.rarity}</span>
+                         </div>
+                         <TierStars tier={tier} size={18} />
+                       </div>
+                    </div>
+                 );
+              })}
+              {/* Modal Description - Dark Theme */}
+              <div className="mt-4 text-sm text-gray-400 text-center bg-black/30 rounded-lg p-3 border border-white/10">
+                <p>Rarity reflects the observed frequency of birds (% of extant species).</p>
+                <p className="mt-1">Higher tiers indicate rarer captures for your collection!</p>
+              </div>
+            </div>
+            {/* Modal Footer - Dark Theme */}
+            <div className="border-t border-blue-300/20 p-3 bg-black/50">
+              <button onClick={() => setShowRarityGuide(false)} className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg font-semibold transform active:scale-[0.98] transition">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Global Styles & Animations (Reverted to Dark Theme ones) */}
+      <style jsx global>{`
+        @keyframes drift { from { transform: translate(0px, 0px) rotate(0deg); } to { transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px) rotate(${Math.random() * 10 - 5}deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.8; transform: scale(1.05); } }
+        @keyframes pulse-slow { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } }
+        @keyframes subtle-pulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-slide-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animation-delay-2s { animation-delay: 2s; }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+        /* Scrollbar for Dark Theme */
+        .max-h-\[60vh\]::-webkit-scrollbar { width: 6px; }
+        .max-h-\[60vh\]::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+        .max-h-\[60vh\]::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+        .max-h-\[60vh\]::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+      `}</style>
+    </div>
   );
 }
-File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\api\cron-sync-ebird\route.ts
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\api\bounty\route.ts
+import { supabase } from "@/lib/supabase";
+
+export async function GET(req: Request) {
+  const url   = new URL(req.url);
+  const state = url.searchParams.get("state") ?? "Connecticut";
+
+  const { data, error } = await supabase.rpc("get_state_bounty", { p_state: state });
+  return error
+    ? new Response(error.message, { status: 500 })
+    : Response.json(data, { headers: { "cache-control": "s-maxage=3600" } });
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\api\cron-sync-global\route.ts
 import { createClient } from '@supabase/supabase-js';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-// Configure Edge runtime and timeout
 export const runtime = 'edge';
-export const maxDuration = 300; // seconds
+export const maxDuration = 180; // seconds
 
-// Initialize Supabase client with Service Role
 const supa = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { global: { fetch } }
 );
-const EBIRD = process.env.EBIRD_KEY!;
 
-// Fetch average monthly checklist frequency histogram for a species in a region
-async function avgHist(species: string, region: string): Promise<number> {
-  const url = `https://api.ebird.org/v2/product/histogram/${region}?spp=${species}`;
-  const res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD } });
-  if (!res.ok) throw new Error(`eBird ${res.status}: ${res.statusText}`);
-  const { histogram } = (await res.json()) as { histogram: number[] };
-  return histogram.reduce((sum, v) => sum + v, 0) / histogram.length;
+async function gbifCount(key: number): Promise<number> {
+  const url =
+    `https://api.gbif.org/v1/occurrence/search?taxon_key=${key}` +
+    `&year=2019,2024&license=CC0,CC_BY,CC_BY_SA&limit=0`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`GBIF ${res.status}: ${res.statusText}`);
+  const { count } = await res.json();
+  return count ?? 0;
 }
 
-export default async function handler(_: NextRequest) {
-  // 1) Load county and species lists
-  const { data: counties, error: cErr } = await supa.from('county').select();
-  const { data: speciesList, error: sErr } = await supa.from('species').select('species_code');
-  if (cErr || !counties) {
-    return NextResponse.json({ error: 'Failed to fetch counties', details: cErr }, { status: 500 });
-  }
-  if (sErr || !speciesList) {
-    return NextResponse.json({ error: 'Failed to fetch species', details: sErr }, { status: 500 });
-  }
+export default async function handler() {
+  // species table must have gbif_key (integer taxonKey) column
+  const { data: sp } = await supa
+    .from('species')
+    .select('species_code, gbif_key');
 
-  // 2) Gather raw frequencies
-  const rows: { species_code: string; county_fips: string; pct: number }[] = [];
-  const batch: Promise<any>[] = [];
-  const push = (p: Promise<any>) => {
-    batch.push(p);
-    if (batch.length >= 5) {
-      return Promise.all(batch.splice(0));
-    }
-    return Promise.resolve();
-  };
-  for (const c of counties) {
-    // Ensure 3-digit county code for eBird region
-    const region = `US-CT-${c.county_fips.slice(2).padStart(3, '0')}`;
-    for (const s of speciesList) {
-      // Queue up to 5 concurrent requests
-      push(
-        avgHist(s.species_code, region).then((pct) => {
-          rows.push({ species_code: s.species_code, county_fips: c.county_fips, pct });
-        })
-      );
-    }
-  }
-  await Promise.all(batch);
+  const CONC = 10;
+  const queue: Promise<void>[] = [];
+  const rows: { species_code: string; n_records: number; percentile?: number }[] = [];
 
-  // 3) Compute percentiles by county
-  const byCounty: Record<string, typeof rows> = {} as any;
-  for (const r of rows) {
-    (byCounty[r.county_fips] ||= []).push(r);
-  }
-  const upserts: { species_code: string; county_fips: string; pct_lists: number; percentile: number }[] = [];
-  for (const [fips, arr] of Object.entries(byCounty)) {
-    const sorted = arr.sort((a, b) => a.pct - b.pct);
-    sorted.forEach((r, i) => {
-      upserts.push({
-        species_code: r.species_code,
-        county_fips: fips,
-        pct_lists: r.pct * 100,
-        percentile: (i / (sorted.length - 1)) * 100,
-      });
-    });
-  }
-
-  // 4) Upsert frequency table
-  const { error: upErr } = await supa.from('checklist_freq').upsert(upserts);
-  if (upErr) {
-    return NextResponse.json({ error: 'Upsert failed', details: upErr }, { status: 500 });
-  }
-  return NextResponse.json({ inserted: upserts.length });
-}
-File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\actions.ts
-"use server";
-import OpenAI from "openai";
-import { Buffer } from "buffer";
-import { getTier } from "@/lib/tier";
-
-export async function analyze(
-  file: File,
-  pos?: GeolocationPosition
-): Promise<{ species: string; tier: string }> {
-  // Convert image to base64
-  const arrayBuffer = await file.arrayBuffer();
-  const base64 = Buffer.from(arrayBuffer).toString("base64");
-
-  // Identify species via OpenAI Vision (single user message with image)
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-  const messages = [
-    {
-      role: "user",
-      content: [
-        { type: "text", text: "Identify the bird species in the image." },
-        { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64}` } }
-      ]
-    }
-  ];
-  // Note: casting to any to accommodate Vision chat message format
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    max_tokens: 30,
-    messages: messages as any,
-  });
-  const species = completion.choices[0].message?.content?.trim() ?? "Unknown";
-
-  // Prepare location data
-  const loc = pos?.coords
-    ? { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
-    : undefined;
-
-  // Lookup rarity tier
-  const tier = await getTier(species, loc);
-
-  return { species, tier };
-}
-File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\page.tsx
-"use client";
-import { useState } from "react";
-import { analyze } from "./actions";
-
-export default function CapturePage() {
-  const [file, setFile] = useState<File>();
-  const [res, setRes] = useState<{ species: string; tier: string } | null>(null);
-
-  async function run() {
-    if (!file) return;
-    const pos = await new Promise<GeolocationPosition | undefined>((ok) =>
-      navigator.geolocation.getCurrentPosition(ok, () => ok(undefined), {
-        maximumAge: 6e5,
-        timeout: 5e3,
+  for (const row of sp ?? []) {
+    // Throttled GBIF count with error logging
+    const p = gbifCount(row.gbif_key)
+      .then(n => {
+        rows.push({ species_code: row.species_code, n_records: n });
       })
-    );
-    setRes(await analyze(file, pos));
+      .catch(err => {
+        console.warn('GBIF lookup failed for', row.species_code, err);
+      });
+    queue.push(p);
+    if (queue.length >= CONC) {
+      await Promise.all(queue.splice(0));
+    }
   }
+  await Promise.all(queue);
 
+  // compute percentiles
+  const sorted = [...rows].sort((a, b) => a.n_records - b.n_records);
+  // Compute percentiles, guarding against divide-by-zero
+  const denom = Math.max(sorted.length - 1, 1);
+  sorted.forEach((r, i) => {
+    r.percentile = (i / denom) * 100;
+  });
+
+  await supa.from('species_freq').upsert(sorted);
+  return NextResponse.json({ upserted: sorted.length });
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\bounty\actions.ts
+// src/app/bounty/actions.ts
+"use server";
+
+// Assuming you have a central place for your Supabase client, otherwise initialize here
+// import { supabase } from '@/lib/supabaseClient'; // Example import
+import { createClient } from '@supabase/supabase-js'; // Or initialize directly
+
+// Define the expected return type from your Supabase RPC
+export interface BountyBird {
+    com_name: string;
+    tier: string; // Global tier (S, A, B, C, D, X, E)
+    n_local: number; // Local records count
+    // species_code?: string; // Optional: Include if needed for linking/details
+}
+
+// Ensure Supabase env vars are available
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+    console.error("Supabase environment variables SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set.");
+    // Throwing error during module load might be too aggressive, handle in function
+}
+
+export async function fetchBounty(state: string): Promise<BountyBird[]> {
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+        throw new Error("Supabase environment variables are not configured.");
+    }
+    // Initialize Supabase client for server-side use
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+    if (!state) {
+        console.warn("fetchBounty called without a state.");
+        return []; // Return empty if no state provided
+    }
+
+    try {
+        console.log(`Fetching bounty for state: ${state}`); // Server-side log
+        const { data, error } = await supabase.rpc('get_state_bounty', { p_state: state });
+
+        if (error) {
+            console.error('Supabase RPC Error (get_state_bounty):', error);
+            throw new Error(`Failed to fetch bounty for ${state}: ${error.message}`);
+        }
+
+        console.log(`Fetched ${data?.length ?? 0} bounty birds for ${state}`);
+
+        // Ensure data matches the expected structure, or return empty array
+        return (data as BountyBird[] || []);
+
+    } catch (err) {
+        // Log the specific error caught
+        if (err instanceof Error) {
+             console.error(`Error in fetchBounty for ${state}:`, err.message);
+        } else {
+             console.error(`Unknown error fetching bounty for ${state}:`, err);
+        }
+        // Depending on desired frontend behavior, you might re-throw or return empty
+        // Returning empty allows the frontend to show "No bounty found" gracefully
+        return [];
+    }
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\bounty\page.tsx
+// src/app/bounty/page.tsx
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Loader2,
+  AlertTriangle,
+  MapPin,
+  Target,
+} from "lucide-react";
+
+import { fetchBounty, BountyBird } from "./actions";
+import { getTierConfig, renderStars } from "@/lib/tierUtils";
+import { useUserState } from "@/hooks/useUserState";      // ← NEW
+
+export default function BountyPage() {
+  /* ─────────────  location & data state ───────────── */
+  const state = useUserState();                 // auto-detect or "Connecticut"
+  const [bounty, setBounty] = useState<BountyBird[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  /* ─────────────  fetch whenever state resolved ───── */
+  useEffect(() => {
+    if (!state) return;                         // still resolving location
+    (async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        setBounty(await fetchBounty(state));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error.");
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [state]);
+
+  /* ─────────────  UI helpers ───────────── */
+  const header = (
+    <header className="bg-gradient-to-r from-indigo-800 to-purple-800 text-white p-4 shadow-md sticky top-0 z-20">
+      <div className="container mx-auto flex items-center">
+        <Link
+          href="/"
+          className="p-2 mr-2 -ml-2 rounded-full hover:bg-white/10"
+          aria-label="Go Home"
+        >
+          <ArrowLeft size={24} />
+        </Link>
+        <h1 className="text-xl font-semibold flex items-center gap-2">
+          <Target size={20} /> Bounty Board
+        </h1>
+        {state && (
+          <span className="ml-auto text-sm bg-white/10 px-2 py-0.5 rounded flex items-center gap-1">
+            <MapPin size={12} /> {state}
+          </span>
+        )}
+      </div>
+    </header>
+  );
+
+  if (!state)
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
+        {header}
+        <main className="flex-grow flex items-center justify-center">
+          <Loader2 className="animate-spin text-indigo-300 mr-3" />
+          Locating…
+        </main>
+      </div>
+    );
+
+  /* ─────────────  rendered bounty list ───────────── */
   return (
-    <main className="flex flex-col gap-5 p-6">
-      <input
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={(e) => setFile(e.target.files?.[0])}
-        className="mb-4"
-      />
-      <button
-        onClick={run}
-        disabled={!file}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Identify!
-      </button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-800 via-indigo-900 to-black text-gray-100 pb-16">
+      {header}
 
-      {res && (
-        <section className="bg-white dark:bg-gray-800 rounded shadow p-4 text-center mt-6">
-          <h2 className="text-2xl font-semibold">{res.species}</h2>
-          <p className="mt-1">
-            Tier <span className="font-bold">{res.tier}</span>
+      <main className="flex-grow container mx-auto px-4 pt-6">
+        <div className="mb-6 text-center sm:text-left">
+          <h2 className="text-2xl font-bold text-yellow-300 mb-1">
+            Local Bounties: {state}
+          </h2>
+          <p className="text-gray-300 text-sm">
+            Globally rare birds recently recorded in your state. Go find them!
           </p>
-        </section>
-      )}
-    </main>
+        </div>
+
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 size={48} className="animate-spin text-indigo-300" />
+            <p className="ml-4 text-lg">Loading bounties…</p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && !isLoading && (
+          <div className="bg-red-900/50 border border-red-500/50 rounded-xl p-6 text-center max-w-lg mx-auto">
+            <AlertTriangle
+              size={32}
+              className="text-red-300 mx-auto mb-3"
+            />
+            <h3 className="text-xl font-semibold text-red-200 mb-2">
+              Error Loading Bounties
+            </h3>
+            <p className="text-red-300">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-1.5 rounded-lg text-sm font-medium"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Success with data */}
+        {!isLoading && !error && bounty.length > 0 && (
+          <ul className="space-y-3">
+            {bounty.map((bird) => {
+              const tierCfg = getTierConfig(bird.tier);
+              return (
+                <li
+                  key={bird.com_name}
+                  className="bg-gray-700/40 border border-gray-600/50 rounded-lg p-3 sm:p-4 flex items-center gap-4 hover:bg-gray-600/50 transition"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg bg-gradient-to-br ${tierCfg.bgGradient}`}
+                    title={`${tierCfg.name} Tier`}
+                  >
+                    {bird.tier}
+                  </div>
+                  <div className="flex-grow overflow-hidden">
+                    <h3
+                      className="font-semibold capitalize truncate"
+                      title={bird.com_name}
+                    >
+                      {bird.com_name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs">
+                      {renderStars(bird.tier)}
+                      <span className={`opacity-80 ${tierCfg.textColor}`}>
+                        ({tierCfg.name})
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-gray-300 whitespace-nowrap">
+                      {bird.n_local} record{bird.n_local === 1 ? "" : "s"} locally
+                    </p>
+                    <p className="text-xs text-gray-400">in {state}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        {/* Success but empty */}
+        {!isLoading && !error && bounty.length === 0 && (
+          <div className="text-center py-12">
+            <div className="w-20 h-20 bg-gray-600/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Target size={36} className="text-gray-500" />
+            </div>
+            <p className="text-lg font-medium text-gray-100">
+              No specific bounties found for {state} right now.
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Keep exploring—rare birds could be anywhere!
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
-File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\Nav.tsx
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\actions.ts
+// src/app/capture/actions.ts
+"use server";
+
+/* ------------------------------------------------------------------
+   Photo → local-rarity tier
+   • model only sees species *codes* valid in the user’s state
+   • no global counts anywhere
+------------------------------------------------------------------- */
+
+import OpenAI from "openai";
+import { Buffer } from "buffer";
+import { createClient } from "@supabase/supabase-js";
+
+/* ── env & model quirks ─────────────────────────────────────────── */
+const PRIMARY      = process.env.OPENAI_MODEL_PRIMARY   ?? "gpt-4.1-mini";
+const SECONDARY    = process.env.OPENAI_MODEL_SECONDARY ?? "gpt-4o";
+const DETAIL_P     = process.env.OPENAI_VISION_DETAIL_PRIMARY   ?? "low";
+const DETAIL_S     = process.env.OPENAI_VISION_DETAIL_SECONDARY ?? "high";
+const THRESHOLD    = Number(process.env.OPENAI_CONF_THRESHOLD   ?? 0.75);
+const TOKENS       = 40;
+const MAX_RETRY    = 2;
+
+const supa = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false }, global: { fetch } }
+);
+
+/* ── 1.  state → cached shortlist of species codes ─────────────── */
+const shortlistCache = new Map<string, { csv: string; set: Set<string> }>();
+
+async function getShortlist(state: string) {
+  if (shortlistCache.has(state)) return shortlistCache.get(state)!;
+
+  const { data, error } = await supa
+    .from("species_freq_state")
+    .select("species_code")
+    .eq("state", state)
+    .gt("n_local", 0);
+
+  if (error || !data) throw new Error("Cannot load species list for " + state);
+
+  const codes = data.map(r => r.species_code);
+  const csv   = codes.join(", ");
+  const set   = new Set(codes);
+
+  shortlistCache.set(state, { csv, set });
+  return { csv, set };
+}
+
+/* ── 2.  map code → common name for display ────────────────────── */
+async function code2name(code: string): Promise<string> {
+  const { data } = await supa
+    .from("species")
+    .select("com_name")
+    .eq("species_code", code)
+    .single();
+
+  return data?.com_name ?? code;
+}
+
+/* ── 3. local tier helper (percentile curve) ───────────────────── */
+async function localTier(code: string, state: string, nLocal: number): Promise<string> {
+  if (nLocal === 0) return "X";
+
+  const { data: all } = await supa
+    .from("species_freq_state")
+    .select("species_code,n_local")
+    .eq("state", state)
+    .gt("n_local", 0);
+
+  const sorted = all!.sort((a,b) => a.n_local - b.n_local);
+  const rank   = sorted.findIndex(r => r.species_code === code);
+  const p      = rank / (sorted.length - 1);
+
+  return  p < 0.05 ? "S"
+        : p < 0.20 ? "A"
+        : p < 0.52 ? "B"
+        : p < 0.81 ? "C"
+        :            "D";
+}
+
+/* ── 4. model parameter builder ────────────────────────────────── */
+function params(model: string) {
+  const mini = /mini/i.test(model);
+  return mini
+    ? { model, max_completion_tokens: TOKENS,
+        response_format: { type: "json_object" } as const }
+    : { model, max_tokens: TOKENS, temperature: 0,
+        response_format: { type: "json_object" } as const };
+}
+
+/* ── 5. identify with shortlist constraint ────────────────────── */
+async function identify(
+  model: string,
+  detail: string,
+  base64: string,
+  state: string,
+  attempt = 0
+): Promise<{ code: string; confidence: number }> {
+
+  const { csv, set } = await getShortlist(state);
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+  const rsp = await openai.chat.completions.create({
+    ...params(model),
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an expert birder.\n" +
+          'Return EXACTLY one JSON object: {"species_code":"code","confidence":0-1}.\n' +
+          "The species_code **must** be chosen from the provided list. " +
+          "If no living bird is visible return {\"species_code\":\"NOT_BIRD\",\"confidence\":0-1}."
+      },
+      {
+        role: "user",
+        content: [
+          { type:"image_url",
+            image_url:{ url:`data:image/jpeg;base64,${base64}`, detail } },
+          { type:"text",
+            text:"Allowed species codes:\n" + csv }
+        ]
+      }
+    ]
+  });
+
+  try {
+    const { species_code, confidence } = JSON.parse(
+      rsp.choices[0].message.content!
+    );
+    if (!set.has(species_code)) throw new Error("model chose invalid code");
+
+    return { code: species_code, confidence };
+  } catch (err) {
+    if (attempt < MAX_RETRY) {
+      return identify(model, detail, base64, state, attempt + 1);
+    }
+    throw new Error("Identify failed: " + err);
+  }
+}
+
+/* ── 6. exported action ─────────────────────────────────────────── */
+/** `state` must be the user’s state name (e.g. "Connecticut") */
+export async function analyze(file: File, state: string) {
+  const base64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+
+  /* primary → fallback → higher-detail pass if needed */
+  let res = await identify(PRIMARY,   DETAIL_P, base64, state)
+           .catch(() => identify(SECONDARY, DETAIL_S, base64, state));
+
+  if (res.confidence < THRESHOLD) {
+    res = await identify(SECONDARY, DETAIL_S, base64, state);
+  }
+
+  /* look up local count to compute percentile tier */
+  const { data: row } = await supa
+    .from("species_freq_state")
+    .select("n_local")
+    .eq("state", state)
+    .eq("species_code", res.code)
+    .single();
+
+  const nLocal = row?.n_local ?? 0;
+  const tier   = await localTier(res.code, state, nLocal);
+  const name   = await code2name(res.code);
+
+  return { species: name, tier };
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\capture\page.tsx
+// src/app/capture/page.tsx
 "use client";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { Camera, Upload, ArrowLeft, Sparkles } from "lucide-react"; // Removed X, Star
+import Image from 'next/image'; // NEW: Import next/image
+import { analyze } from "./actions";
+import { useTickets } from '@/context/TicketsContext';
+import { useCollection } from '@/context/CollectionContext';
+import { toast } from 'react-hot-toast';
+import Link from 'next/link';
+import { getTierConfig, renderStars } from '@/lib/tierUtils';
+import { useUserState } from '@/hooks/useUserState';
+
+type CaptureState = 'home' | 'camera' | 'upload' | 'analyzing' | 'result';
+
+export default function CapturePage() {
+  const [captureState, setCaptureState] = useState<CaptureState>('home');
+  const [result, setResult] = useState<{ species: string; tier: string } | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  // const [isAnimating, setIsAnimating] = useState(false); // REMOVED: Unused state
+  const [revealed, setRevealed] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  const { tickets, setTickets } = useTickets();
+  const state = useUserState("Connecticut");
+  const { addToCollection } = useCollection();
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Handle camera initialization and cleanup
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    const videoElement = videoRef.current; // Capture ref value inside the effect
+
+    if (captureState === 'camera') {
+      const initCamera = async () => {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false,
+          });
+          if (videoElement) { // Use the captured value
+            videoElement.srcObject = stream;
+          }
+          setCameraError(null);
+        } catch (err) {
+          console.error("Camera error:", err);
+          setCameraError("Camera access denied. Please try uploading a photo instead.");
+          setCaptureState('upload');
+        }
+      };
+      initCamera();
+    }
+
+    // Cleanup function
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (videoElement) { // Use the captured value in cleanup
+        videoElement.srcObject = null;
+      }
+    };
+  }, [captureState]); // Dependency array remains the same
+
+
+  // Capture photo
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      toast.error("Could not process image.");
+      return;
+    }
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        toast.error("Could not capture photo.");
+        return;
+      }
+      const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+      const imageUrl = URL.createObjectURL(blob);
+      setCapturedImage(imageUrl);
+      processImage(file, imageUrl);
+    }, 'image/jpeg', 0.9);
+  };
+
+  // Handle file upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setCapturedImage(imageUrl);
+      processImage(file, imageUrl);
+    }
+  };
+
+  // Process image using your server action
+  const processImage = async (file: File, imageUrl: string) => {
+    if (tickets <= 0) {
+      toast.error("You don't have any tickets left!");
+      setCapturedImage(null);
+      setCaptureState('home');
+      URL.revokeObjectURL(imageUrl); // Revoke if not processing
+      return;
+    }
+
+    setTickets(t => Math.max(0, t - 1));
+    setCaptureState('analyzing');
+    // setIsAnimating(true); // REMOVED
+
+    try {
+      const data = await analyze(file, state ?? "Connecticut");
+      setResult(data);
+
+      setTimeout(() => {
+        // setIsAnimating(false); // REMOVED
+        setCaptureState('result');
+
+        if (data.species.toUpperCase() !== 'NOT_BIRD') {
+          addToCollection({
+            species: data.species,
+            tier: data.tier,
+            imageUrl: imageUrl
+          });
+        } else {
+          // Revoke URL if it's not a bird and won't be added to collection
+          URL.revokeObjectURL(imageUrl);
+          setCapturedImage(null); // Optionally clear the image preview for "Not a Bird"
+        }
+
+        setTimeout(() => {
+          setRevealed(true);
+        }, 300);
+
+      }, 2500);
+
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      toast.error("Failed to identify the bird. Please try again.");
+      setCaptureState('home');
+      // setIsAnimating(false); // REMOVED
+      setCapturedImage(null);
+      URL.revokeObjectURL(imageUrl);
+      setTickets(t => t + 1); // Refund ticket
+    }
+  };
+
+
+  const resetCapture = useCallback(() => {
+    if (capturedImage) {
+      // Revoke URL only if it wasn't already revoked (e.g., for "NOT_BIRD" case)
+      // Checking result state ensures we don't revoke if it was already done in processImage
+      if (captureState !== 'result' || (result && result.species.toUpperCase() !== 'NOT_BIRD')) {
+         try {
+             URL.revokeObjectURL(capturedImage);
+         } catch (e) {
+            console.warn("Failed to revoke Object URL (might have been revoked already):", e);
+         }
+      }
+    }
+    setCaptureState('home');
+    setResult(null);
+    setCapturedImage(null);
+    // setIsAnimating(false); // REMOVED
+    setRevealed(false);
+    setCameraError(null);
+  }, [capturedImage, captureState, result]); // Added captureState and result to dependencies
+
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-800 via-indigo-900 to-black text-gray-100 font-sans">
+
+      <header className="bg-gradient-to-r from-indigo-800 to-purple-800 text-white p-4 shadow-md sticky top-0 z-20">
+        <div className="container mx-auto flex items-center">
+          {captureState !== 'home' ? (
+            <button
+              onClick={resetCapture}
+              className="p-2 mr-2 -ml-2 rounded-full hover:bg-white/10 transition-colors"
+              aria-label="Back"
+            >
+              <ArrowLeft size={24} />
+            </button>
+          ) : (
+            <Link href="/" className="p-2 mr-2 -ml-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Go Home">
+              <ArrowLeft size={24} />
+            </Link>
+          )}
+          <h1 className="text-xl font-semibold">
+            {captureState === 'home' && 'Capture Bird'}
+            {captureState === 'camera' && 'Take Photo'}
+            {captureState === 'upload' && 'Upload Photo'}
+            {captureState === 'analyzing' && 'Identifying...'}
+            {captureState === 'result' && 'Capture Result'}
+          </h1>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 1 1 0-3 .5.5 0 0 0 .5-.5V4.5A1.5 1.5 0 0 0 14.5 3h-13ZM1 4.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v1.004a1.5 1.5 0 0 1 0 2.992V10a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V8.504a1.5 1.5 0 0 1 0-2.992V4.5Z"/>
+              </svg>
+              {tickets}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main className={`flex-grow flex flex-col items-center ${captureState === 'camera' ? 'p-0' : 'p-6'} pt-8`}>
+
+        {/* Home Screen */}
+        {captureState === 'home' && (
+          <div className="flex flex-col items-center w-full px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-yellow-300">Choose Capture Method</h2>
+              <p className="text-gray-300">How will you find your next bird?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-lg">
+              {/* Camera Button Card */}
+              <button
+                onClick={() => setCaptureState('camera')}
+                disabled={tickets <= 0}
+                className={`
+                  bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm rounded-xl p-5 sm:p-6 shadow-lg hover:shadow-indigo-500/30
+                  transform hover:-translate-y-1 transition-all duration-300
+                  flex flex-col items-center gap-3 text-center
+                  ${tickets <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-indigo-400/70'}
+                `}
+              >
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-indigo-500/30 border border-indigo-400/50 flex items-center justify-center">
+                  <Camera size={32} className="text-indigo-200" />
+                </div>
+                <span className="font-semibold text-lg text-gray-100">Take Photo</span>
+                <span className="text-sm text-gray-300">Use your device camera</span>
+              </button>
+
+              {/* Upload Button Card */}
+              <button
+                onClick={() => setCaptureState('upload')}
+                disabled={tickets <= 0}
+                className={`
+                  bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm rounded-xl p-5 sm:p-6 shadow-lg hover:shadow-purple-500/30
+                  transform hover:-translate-y-1 transition-all duration-300
+                  flex flex-col items-center gap-3 text-center
+                  ${tickets <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-purple-400/70'}
+                `}
+              >
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-purple-500/30 border border-purple-400/50 flex items-center justify-center">
+                  <Upload size={32} className="text-purple-200" />
+                </div>
+                <span className="font-semibold text-lg text-gray-100">Upload Photo</span>
+                <span className="text-sm text-gray-300">Choose from gallery</span>
+              </button>
+            </div>
+
+            {/* Out of Tickets Message */}
+            {tickets <= 0 && (
+              <div className="mt-8 p-4 bg-red-900/50 border border-red-500/50 rounded-xl text-center max-w-lg w-full">
+                <p className="text-red-300 font-medium mb-2">
+                  You&apos;re out of capture tickets! {/* FIXED: Escaped apostrophe */}
+                </p>
+                <p className="text-sm text-gray-300">
+                  Check back later or visit the shop.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Camera Mode */}
+        {captureState === 'camera' && (
+          <div className="flex flex-col items-center justify-center w-full h-full flex-grow">
+            {cameraError ? (
+              <div className="text-center p-6 text-red-400 flex flex-col items-center gap-4">
+                <p className="max-w-md">{cameraError}</p>
+                <button
+                  onClick={() => setCaptureState('upload')}
+                  className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full font-semibold"
+                >
+                  Upload Photo Instead
+                </button>
+              </div>
+            ) : (
+              <div className="relative w-full h-full flex flex-col">
+                <div className="relative flex-grow w-full overflow-hidden bg-black">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-2 sm:inset-4 border-2 border-white/40 rounded-lg pointer-events-none"></div>
+                </div>
+
+                <div className="flex-shrink-0 p-4 bg-gray-900/30 backdrop-blur-sm flex flex-col items-center">
+                   <button
+                    onClick={capturePhoto}
+                    aria-label="Capture Photo"
+                    className="
+                      w-16 h-16 sm:w-20 sm:h-20
+                      rounded-full shadow-xl flex items-center justify-center
+                      bg-gradient-to-br from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600
+                      transform hover:scale-105 active:scale-95 transition-all duration-200"
+                  >
+                    <Camera size={32} className="text-gray-900" />
+                  </button>
+                   <p className="text-center text-gray-300 text-sm mt-2">
+                     Tap button to capture
+                   </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Upload Mode */}
+        {captureState === 'upload' && (
+          <div className="flex flex-col items-center justify-center w-full max-w-md">
+            <div className="w-full p-6 sm:p-8 bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm rounded-xl shadow-lg text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-purple-500/30 border border-purple-400/50 flex items-center justify-center mx-auto mb-5">
+                <Upload size={32} className="text-purple-200" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 text-gray-100">Upload Bird Photo</h2>
+              <p className="mb-6 text-gray-300">Select a clear photo for identification.</p>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="image/*"
+                className="hidden"
+              />
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="
+                  bg-gradient-to-br from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600
+                  text-gray-900 font-bold text-lg
+                  py-3 px-8 sm:py-4 sm:px-10
+                  rounded-full shadow-lg transform active:scale-95 transition-all duration-200"
+              >
+                Select Photo
+              </button>
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* Analyzing Mode Overlay */}
+      {captureState === 'analyzing' && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm" aria-live="assertive">
+          <div className="relative flex flex-col items-center justify-center text-center p-8">
+            <div className="absolute -inset-10 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 rounded-full blur-xl opacity-40 animate-spin" style={{ animationDuration: '6s' }}></div>
+            <div className="absolute -inset-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-md opacity-60 animate-ping" style={{ animationDuration: '1.5s' }}></div>
+            <div className="relative bg-gray-800/50 border border-yellow-500/50 rounded-full p-6 shadow-lg backdrop-blur-sm">
+              <Sparkles size={56} className="text-yellow-400 animate-pulse" />
+            </div>
+            <p className="text-white font-semibold text-xl mt-6 animate-pulse">
+              Identifying Bird...
+            </p>
+            <p className="text-gray-300 mt-1 text-sm">
+              Good luck! ✨
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Result Screen Overlay */}
+      {captureState === 'result' && result && (
+        <div className={`fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'} ${getTierConfig(result.tier).containerClass}`}>
+          {revealed && (result.tier === 'S' || result.tier === 'A' || result.tier === 'B') && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(getTierConfig(result.tier).confettiCount)].map((_, i) => {
+                const size = Math.random() * 8 + 4;
+                const left = Math.random() * 100;
+                const animDuration = Math.random() * 3 + 2.5;
+                const delay = Math.random() * 1.5;
+                return (
+                  <div key={i} className="absolute rounded-full bg-white/80" style={{ left: `${left}%`, top: '-15px', width: `${size}px`, height: `${size}px`, animation: `fall ${animDuration}s linear ${delay}s infinite` }}/>
+                );
+              })}
+               <style>{`
+                @keyframes fall {
+                  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+              `}</style>
+            </div>
+          )}
+
+          <div className="w-full max-w-md relative z-10">
+            <div className={`transform transition-all duration-700 ease-out ${revealed ? "scale-100 opacity-100" : "scale-90 opacity-0"}`}>
+              <div className="flex justify-center mb-5 sm:mb-6">
+                <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full ${getTierConfig(result.tier).badgeClass} text-white flex items-center justify-center text-4xl sm:text-5xl font-bold shadow-2xl animate-pulse ring-offset-2 ring-offset-black/20`}>
+                  {result.tier}
+                </div>
+              </div>
+
+              <div className="text-center mb-5 sm:mb-6">
+                <h2 className="text-white text-xl sm:text-2xl font-bold tracking-wider uppercase animate-pulse">{getTierConfig(result.tier).title}</h2>
+                {renderStars(result.tier)}
+              </div>
+
+              <div className="bg-gray-800/60 border border-gray-600/50 backdrop-blur-md rounded-xl overflow-hidden shadow-xl transform transition-all duration-500 hover:scale-[1.02]">
+                {/* FIXED: Use next/image */}
+                <div className="relative w-full aspect-video overflow-hidden bg-gray-700">
+                  {capturedImage ? (
+                     <Image
+                        src={capturedImage}
+                        alt={result.species.toUpperCase() === 'NOT_BIRD' ? 'Captured image' : result.species.replace(/_/g, ' ')}
+                        fill // Make image fill the container
+                        style={{ objectFit: 'contain' }} // Match original object-contain style
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optional: provide sizes hint
+                     />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-500">No Image</div>
+                  )}
+                </div>
+
+                <div className="p-4 sm:p-6 text-center">
+                  <h3 className={`text-2xl sm:text-3xl font-bold mb-3 capitalize ${getTierConfig(result.tier).nameClass}`}>
+                    {result.species.toUpperCase() === 'NOT_BIRD' ? 'Not a Bird' : result.species.replace(/_/g, ' ')}
+                  </h3>
+
+                  <p className="text-gray-300 text-sm sm:text-base mb-6 min-h-[3em]">
+                    {result.species.toUpperCase() === 'NOT_BIRD' ?
+                      "This doesn't appear to be a bird. No collection entry added. Try another image!" :
+                      result.tier === 'S' ? "Incredible! A legendary find added to your collection!" :
+                      result.tier === 'A' ? "Amazing! An epic bird joins your collection." :
+                      result.tier === 'B' ? "Excellent! A rare bird captured." :
+                      result.tier === 'C' ? "Nice! An uncommon bird for your collection." :
+                      "A common bird has been added to your collection."}
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                      onClick={resetCapture}
+                      className="
+                        bg-white/10 hover:bg-white/20 border border-white/30 text-gray-100
+                        font-semibold py-2.5 px-6 rounded-lg shadow-md transition duration-200 w-full sm:w-auto"
+                    >
+                      Continue Capturing
+                    </button>
+
+                    <Link href="/collection" className="w-full sm:w-auto">
+                       <button className="
+                        bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white
+                        font-bold py-2.5 px-6 rounded-lg shadow-md transition duration-200 w-full"
+                       >
+                         View Collection
+                       </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\app\collection\page.tsx
+// src/app/collection/page.tsx
+"use client";
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Filter, X, Star } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image'; // NEW: Import next/image
+import { useCollection } from '@/context/CollectionContext';
+import { getTierConfig, renderStars } from '@/lib/tierUtils';
+
+
+export default function CollectionPage() {
+  // Assuming useCollection provides typed collection data
+  const { collection } = useCollection();
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Sort collection by captured date (newest first) by default
+  const sortedCollection = React.useMemo(() =>
+    [...collection].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
+    [collection]
+  );
+
+  // Filter sorted collection
+  const filteredCollection = React.useMemo(() =>
+    activeFilter
+      ? sortedCollection.filter(bird => bird.tier === activeFilter)
+      : sortedCollection,
+    [sortedCollection, activeFilter]
+  );
+
+  // Animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 100); // Short delay for transition
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Group birds by tier for statistics (using original unsorted collection)
+  const stats = React.useMemo(() =>
+      collection.reduce((acc, bird) => {
+        acc[bird.tier] = (acc[bird.tier] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>),
+    [collection]
+  );
+
+  // Calculate completion percentage
+  const uniqueSpecies = React.useMemo(() =>
+    new Set(collection.map(bird => bird.species)).size,
+    [collection]
+  );
+  const estimatedTotal = 100; // Placeholder: Replace with actual total possible species
+  const completionPercentage = Math.min(100, Math.round((uniqueSpecies / estimatedTotal) * 100));
+
+  return (
+    // Main container using the dark theme background
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-800 via-indigo-900 to-black text-gray-100 font-sans pb-16">
+
+      {/* Header - Consistent Dark Gradient */}
+      <header className="bg-gradient-to-r from-indigo-800 to-purple-800 text-white p-4 shadow-md sticky top-0 z-20">
+        <div className="container mx-auto flex items-center">
+          <Link href="/" className="p-2 mr-2 -ml-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Go Home">
+            <ArrowLeft size={24} />
+          </Link>
+          <h1 className="text-xl font-semibold">My Collection</h1>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="ml-auto p-2 rounded-lg hover:bg-white/30 transition-colors" // Slightly larger tap area
+            aria-label="Filter Collection"
+            aria-expanded={showFilters}
+          >
+            <Filter size={20} />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-grow container mx-auto px-4 pt-4">
+
+        {/* Collection Stats Card - Dark Theme */}
+        <section aria-labelledby="collection-stats-heading" className={`bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm rounded-xl shadow-lg mb-4 transition-all duration-500 transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+          <div className="p-4">
+            <h2 id="collection-stats-heading" className="text-lg font-semibold mb-3 text-gray-100">Collection Progress</h2>
+            <div className="flex justify-between mb-1 text-sm text-gray-300">
+              <span>{uniqueSpecies} unique species</span>
+              <span>{completionPercentage}% complete</span>
+            </div>
+            <div className="w-full bg-gray-600/50 rounded-full h-2.5 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${completionPercentage}%` }}
+                aria-valuenow={completionPercentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              ></div>
+            </div>
+          </div>
+
+          {/* Stats Breakdown - Dark Theme */}
+          <div className="border-t border-gray-600/50">
+            <div className="p-4 grid grid-cols-5 gap-2 max-w-md mx-auto">
+              {['S', 'A', 'B', 'C', 'D'].map(tier => {
+                const config = getTierConfig(tier);
+                return (
+                  <div key={tier} className="text-center">
+                    <div
+                      className={`w-8 h-8 mx-auto rounded-full bg-gradient-to-r ${config.bgGradient} flex items-center justify-center text-white font-bold text-sm mb-1 shadow-sm`}
+                      title={config.name} // Tooltip for tier name
+                    >
+                      {tier}
+                    </div>
+                    <div className={`text-xs font-medium ${config.textColor}`}>
+                      {stats[tier] || 0}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Filter Panel - Dark Theme */}
+        <section aria-live="polite" className={`bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-out transform origin-top ${showFilters ? 'scale-y-100 opacity-100 max-h-96 mb-4' : 'scale-y-0 opacity-0 max-h-0'}`}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-100">Filter by Tier</h3>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-gray-100 hover:bg-white/10"
+                aria-label="Close Filters"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {/* "All" Filter Button */}
+              <button
+                onClick={() => setActiveFilter(null)}
+                aria-pressed={activeFilter === null}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                    activeFilter === null
+                    ? 'bg-indigo-500 text-white shadow-sm'
+                    : 'bg-gray-600/70 hover:bg-gray-500/70 text-gray-300'
+                }`}
+              >
+                All
+              </button>
+
+              {/* Tier Filter Buttons */}
+              {['S', 'A', 'B', 'C', 'D'].map(tier => {
+                const config = getTierConfig(tier);
+                const count = stats[tier] || 0;
+                return (
+                  <button
+                    key={tier}
+                    onClick={() => setActiveFilter(tier)}
+                    disabled={count === 0} // Disable if no birds of this tier
+                    aria-pressed={activeFilter === tier}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1 transition-colors duration-200 ${
+                      activeFilter === tier
+                        ? `bg-gradient-to-r ${config.bgGradient} text-white shadow-sm`
+                        : count === 0
+                          ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-60'
+                          : 'bg-gray-600/70 hover:bg-gray-500/70 text-gray-300'
+                    }`}
+                  >
+                    {tier}
+                    <span className={`text-xs font-normal opacity-80 ${activeFilter === tier ? '' : count > 0 ? '' : 'text-gray-600'}`}>
+                      ({count})
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Collection Grid - Dark Theme Cards */}
+        {filteredCollection.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            {filteredCollection.map((bird, index) => {
+              const config = getTierConfig(bird.tier);
+              return (
+                <div
+                  key={bird.id} // Use unique bird ID
+                  className={`
+                    bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm
+                    rounded-lg overflow-hidden shadow-md hover:shadow-lg hover:border-gray-500/70
+                    transition-all duration-300 transform will-change-transform
+                    ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}
+                  `}
+                  style={{ transitionDelay: `${index * 30}ms` }} // Faster stagger
+                >
+                  {/* Card Image Area */}
+                  <div className={`relative aspect-square overflow-hidden bg-gray-600 ${config.borderColor} border-b-2`}>
+                    {/* FIXED: Use next/image */}
+                    <Image
+                      src={bird.imageUrl}
+                      alt={bird.species.replace(/_/g, ' ')}
+                      fill // Use fill as parent provides aspect ratio
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" // Optimize image loading
+                      className="transition-transform duration-500 ease-in-out hover:scale-105" // Keep hover effect
+                      style={{ objectFit: 'cover' }} // Match original object-cover
+                    />
+                    {/* Tier Badge on Card */}
+                    <div title={`${config.name} Tier`} className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-gradient-to-r ${config.bgGradient} text-white flex items-center justify-center font-bold text-xs shadow`}>
+                      {bird.tier}
+                    </div>
+                  </div>
+                  {/* Card Content Area */}
+                  <div className="p-2 sm:p-3">
+                    <h3 className="font-semibold text-sm sm:text-base capitalize truncate text-gray-100" title={bird.species.replace(/_/g, ' ')}>
+                      {bird.species.replace(/_/g, ' ')}
+                    </h3>
+                    <div className="flex justify-between items-center mt-1">
+                      {renderStars(bird.tier)}
+                      <span className="text-xs text-gray-400 whitespace-nowrap">
+                        {new Date(bird.capturedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          // Empty State - Dark Theme
+          <div className={`text-center py-12 px-6 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            {activeFilter ? (
+              // Empty state when filter is active
+              <div className="flex flex-col items-center gap-4">
+                 <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${getTierConfig(activeFilter).bgGradient} flex items-center justify-center text-white text-3xl font-bold shadow`}>
+                    {activeFilter}
+                 </div>
+                 <p className="text-lg font-medium text-gray-100">
+                   No Tier {activeFilter} birds found yet.
+                 </p>
+                 <button
+                    onClick={() => setActiveFilter(null)}
+                    className="text-indigo-300 hover:text-indigo-200 font-medium hover:underline text-sm"
+                 >
+                   Show all birds
+                 </button>
+              </div>
+            ) : (
+              // Empty state when collection is truly empty
+              <div className="flex flex-col items-center gap-4">
+                 <div className="w-20 h-20 bg-gray-600/50 rounded-full flex items-center justify-center mx-auto border border-gray-500/50">
+                    <Star size={36} className="text-gray-500" />
+                 </div>
+                 <p className="text-lg font-medium text-gray-100">
+                   Your bird collection is empty.
+                 </p>
+                 <Link href="/capture">
+                   <button className="
+                    bg-gradient-to-br from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600
+                    text-gray-900 font-bold text-lg py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition-all duration-200"
+                   >
+                     Capture Your First Bird!
+                   </button>
+                 </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+    </div>
+  );
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\CameraCapture.tsx
+"use client";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+interface Props {
+  onShot: (file: File) => void;
+  disabled?: boolean;
+}
+
+export default function CameraCapture({ onShot, disabled = false }: Props) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [error, setError] = useState<string>();
+  const [isCameraReady, setIsCameraReady] = useState(false);
+
+  useEffect(() => {
+    let isActive = true;
+    const videoElement = videoRef.current;
+    let mediaStream: MediaStream | null = null;
+
+    async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        if (isActive) setError("Camera API not supported by this browser.");
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            aspectRatio: { ideal: 16 / 9 }
+          },
+          audio: false
+        });
+        mediaStream = stream;
+        if (isActive && videoElement) {
+          videoElement.srcObject = stream;
+          videoElement.onloadedmetadata = () => {
+            if (isActive) setIsCameraReady(true);
+          };
+          setError(undefined);
+        } else {
+          stream.getTracks().forEach((t) => t.stop());
+        }
+      } catch (err) {
+        console.error("Camera access error:", err);
+        if (isActive) {
+          if (err instanceof Error && err.name === "NotAllowedError") {
+            setError(
+              "Camera access denied. Please grant permission. You can still upload a photo."
+            );
+          } else if (err instanceof Error && err.name === "NotFoundError") {
+            setError("No camera found. You can still upload a photo.");
+          } else {
+            setError("Could not access camera. You can still upload a photo.");
+          }
+        }
+      }
+    }
+
+    startCamera();
+
+    return () => {
+      isActive = false;
+      mediaStream?.getTracks().forEach((t) => t.stop());
+      if (videoElement) {
+        videoElement.srcObject = null;
+      }
+      setIsCameraReady(false);
+    };
+  }, []);
+
+  const shoot = useCallback(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || !isCameraReady || disabled) return;
+
+    if (!canvasRef.current) canvasRef.current = document.createElement("canvas");
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      console.error("Could not get 2D context from canvas");
+      setError("Failed to capture image (canvas context error).");
+      return;
+    }
+
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        console.error("Canvas toBlob returned null");
+        setError("Failed to capture image (blob creation failed).");
+        return;
+      }
+      const fileName = `capture-${Date.now()}.jpg`;
+      const file = new File([blob], fileName, { type: "image/jpeg" });
+      onShot(file);
+    }, "image/jpeg", 0.92);
+  }, [onShot, isCameraReady, disabled]);
+
+  return (
+    <div className="flex flex-col items-center gap-4 w-full">
+      {error ? (
+        <div className="w-full p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 rounded-lg text-center">
+          <p className="text-red-700 dark:text-red-300 font-medium">{error}</p>
+        </div>
+      ) : (
+        <>
+          <div className="w-full aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md relative">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                isCameraReady ? "opacity-100" : "opacity-0"
+              }`}
+            />
+            {!isCameraReady && !error && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-gray-500 dark:text-gray-400">Starting camera...</p>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={shoot}
+            className={`px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 ease-in-out transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 ${
+              disabled || !isCameraReady
+                ? "bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+            }`}
+            disabled={disabled || !isCameraReady}
+          >
+            {isCameraReady ? "Capture Bird" : "Camera Loading..."}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\DailyReward.tsx
+// src/components/DailyReward.tsx
+"use client";
+import React, { useEffect, useState, useContext } from 'react';
+import { TicketsContext } from '@/context/TicketsContext';
+import { toast } from 'react-hot-toast';
+
+function DailyReward() {
+    const { claimDailyReward, timeUntilNextReward } = useContext(TicketsContext);
+    const [showModal, setShowModal] = useState(false);
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+    useEffect(() => {
+        // Check if reward is available on mount
+        const time = timeUntilNextReward();
+        setTimeLeft(time);
+
+        if (time === 0) {
+            setShowModal(true);
+        }
+
+        // Update countdown timer
+        const interval = setInterval(() => {
+            const remaining = timeUntilNextReward();
+            setTimeLeft(remaining);
+
+            if (remaining === 0) {
+                setShowModal(true);
+            }
+        }, 60000); // Check every minute
+
+        return () => clearInterval(interval);
+    }, [timeUntilNextReward]);
+
+    const handleClaim = () => {
+        const claimed = claimDailyReward();
+        if (claimed) {
+            // Show success message
+            toast.success("Daily reward claimed! +5 tickets");
+        }
+        setShowModal(false);
+    };
+
+    // Format time remaining
+    const formatTimeRemaining = () => {
+        if (timeLeft === null || timeLeft === 0) return "Available now!";
+
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        return `Next reward in ${hours}h ${minutes}m`;
+    };
+
+    return (
+        <>
+            {/* Reward button in header */}
+            <button
+                className={`flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    timeLeft === 0 
+                        ? 'bg-yellow-400 text-yellow-900 animate-pulse' 
+                        : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                }`}
+                onClick={() => setShowModal(true)}
+            >
+                🎁 {formatTimeRemaining()}
+            </button>
+
+            {/* Reward modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full">
+                        <h2 className="text-2xl font-bold mb-4 text-center">Daily Reward</h2>
+
+                        {timeLeft === 0 ? (
+                            <div className="text-center">
+                                <div className="text-6xl mb-4">🎁</div>
+                                <p className="text-lg mb-4">Your daily reward is ready!</p>
+                                <button
+                                    onClick={handleClaim}
+                                    className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold"
+                                >
+                                    Claim 5 Tickets
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="text-center">
+                                <div className="text-6xl mb-4">⏳</div>
+                                <p className="text-lg mb-4">{formatTimeRemaining()}</p>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="w-full py-3 bg-gray-500 text-white rounded-lg font-bold"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default DailyReward;
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\GachaPullAnimation.tsx
+// src/components/GachaPullAnimation.tsx
+import React, { useEffect, useState } from 'react';
+import { Star, Camera } from 'lucide-react';
+
+/**
+ * Enhanced gacha pull animation with particles and dynamic effects
+ */
+const GachaPullAnimation: React.FC = () => {
+    const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number; color: string; speed: number; angle: number }>>([]);
+    const [progress, setProgress] = useState(0);
+
+    // Generate random particles for background effect
+    useEffect(() => {
+        const particleCount = 30;
+        const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+            id: i,
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            size: Math.random() * 10 + 5,
+            color: ['#ffcc00', '#ff66cc', '#66ffcc', '#cc66ff'][Math.floor(Math.random() * 4)],
+            speed: Math.random() * 2 + 0.5,
+            angle: Math.random() * 360
+        }));
+        setParticles(newParticles);
+
+        // Simulate loading progress
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                const newProgress = prev + (Math.random() * 10);
+                return newProgress > 100 ? 100 : newProgress;
+            });
+        }, 300);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="gacha-pull-container fixed inset-0 z-50 flex flex-col items-center justify-center p-4 overflow-hidden">
+            {/* Background particles */}
+            <div className="absolute inset-0">
+                {particles.map(particle => (
+                    <div
+                        key={particle.id}
+                        className="absolute rounded-full animate-pulse"
+                        style={{
+                            left: `${particle.x}%`,
+                            top: `${particle.y}%`,
+                            width: `${particle.size}px`,
+                            height: `${particle.size}px`,
+                            backgroundColor: particle.color,
+                            opacity: 0.6,
+                            transform: `rotate(${particle.angle}deg)`,
+                            animation: `float ${particle.speed}s infinite alternate`
+                        }}
+                    />
+                ))}
+            </div>
+
+            {/* Center content with enhanced spinner */}
+            <div className="relative">
+                <div className="gacha-pull-spinner mb-6 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Camera className="text-white h-8 w-8" />
+                    </div>
+                </div>
+
+                {/* Stars that orbit around */}
+                <div className="absolute -inset-8 animate-spin" style={{ animationDuration: '4s' }}>
+                    <Star className="absolute text-yellow-300 h-6 w-6" style={{ top: '0%', left: '50%' }} />
+                    <Star className="absolute text-yellow-300 h-6 w-6" style={{ top: '50%', right: '0%' }} />
+                    <Star className="absolute text-yellow-300 h-6 w-6" style={{ bottom: '0%', left: '50%' }} />
+                    <Star className="absolute text-yellow-300 h-6 w-6" style={{ top: '50%', left: '0%' }} />
+                </div>
+            </div>
+
+            {/* Loading text with progress bar */}
+            <div className="text-center mt-8 w-64">
+                <p className="text-xl font-bold text-white mb-2">
+                    Identifying Bird...
+                </p>
+                <div className="w-full bg-gray-700 rounded-full h-4 mb-2 overflow-hidden">
+                    <div
+                        className="bg-gradient-to-r from-blue-400 to-purple-500 h-full rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${progress}%` }}
+                    ></div>
+                </div>
+                <p className="text-sm text-yellow-300 font-medium animate-pulse">
+                    {progress < 100 ? "Analyzing image..." : "Almost there!"}
+                </p>
+                <p className="text-xs text-gray-300 mt-4">
+                    Good luck on your bird gacha pull!
+                </p>
+            </div>
+        </div>
+    );
+};
+
+export default GachaPullAnimation;
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\Nav.tsx
+"use client"; // Keep this directive
+
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
+import { useContext } from 'react';
+import { TicketsContext } from '@/context/TicketsContext';
+import DailyReward from './DailyReward';
 
 export default function Nav() {
+  const { tickets } = useContext(TicketsContext);
   return (
     <>
       <header className="p-4 bg-white dark:bg-gray-900 shadow">
@@ -275,20 +2297,437 @@ export default function Nav() {
           <Link href="/" className="text-xl font-bold">
             Bird Gacha
           </Link>
-          <nav>
+          <nav className="flex items-center space-x-4">
             <Link
               href="/capture"
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              // Apply disabled styles and prevent clicks if tickets are 0
+              className={`text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-opacity ${
+                tickets === 0 ? 'opacity-50 pointer-events-none' : ''
+              }`}
+              // Prevent navigation if tickets are 0 (optional, belt-and-suspenders)
+              onClick={(e) => {
+                if (tickets === 0) {
+                  e.preventDefault();
+                }
+              }}
+              aria-disabled={tickets === 0} // Improve accessibility
             >
               Capture
             </Link>
+            <Link
+              href="/collection"
+              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Collection
+            </Link>
+
+            {/* Daily Reward Component */}
+            <DailyReward />
+
+            {/* Ticket display */}
+            <span className="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+              🎫 {tickets}
+            </span>
           </nav>
         </div>
       </header>
-      <Toaster />
+      {/* Ensure Toaster is rendered */}
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   );
 }
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\components\ResultsDisplay.tsx
+"use client";
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { getTierConfig, renderStars } from '@/lib/tierUtils';
+
+interface Props {
+  species: string;
+  tier: string;
+  imageUrl?: string;
+  onClose: () => void;
+  onShare?: () => void;
+}
+
+const ResultsDisplay: React.FC<Props> = ({ species, tier, imageUrl, onClose, onShare }) => {
+  const [revealed, setRevealed] = useState(false);
+  const [confetti, setConfetti] = useState<Array<{ id: number; x: number; y: number; rotation: number; color: string; size: number; speed: number }>>([]);
+
+  const config = getTierConfig(tier);
+  const tierClass = `tier-${['S', 'A', 'B', 'C', 'D', 'X'].includes(tier) ? tier : 'unknown'}`;
+  const isNotBird = species.toUpperCase() === 'NOT_BIRD';
+  const isSuperRare = tier === 'S' || tier === 'A';
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setRevealed(true);
+      if (isSuperRare && !isNotBird) {
+        const pieces = config.confettiCount || 0;
+        const newConfetti = Array.from({ length: pieces }, (_, i) => ({
+          id: i,
+          x: 50 + Math.random() * 40 - 20,
+          y: 0,
+          rotation: Math.random() * 360,
+          color: ['#FFD700', '#FFA500', '#FF4500', '#FF6347', '#FFFFFF'][Math.floor(Math.random() * 5)],
+          size: Math.random() * 10 + 5,
+          speed: Math.random() * 3 + 2
+        }));
+        setConfetti(newConfetti);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [tier, isSuperRare, isNotBird, config.confettiCount]);
+
+  return (
+    <div
+      className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm"
+      onClick={revealed ? onClose : undefined}
+    >
+      {isSuperRare && revealed && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {confetti.map(piece => (
+            <div
+              key={piece.id}
+              className="absolute animate-fall"
+              style={{
+                left: `${piece.x}%`,
+                top: `${piece.y}%`,
+                width: `${piece.size}px`,
+                height: `${piece.size}px`,
+                backgroundColor: piece.color,
+                transform: `rotate(${piece.rotation}deg)`,
+                animation: `fall ${piece.speed}s linear forwards`
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <div
+        className={`w-full max-w-sm rounded-xl shadow-2xl overflow-hidden transition-all duration-1000 ${
+          revealed ? 'scale-100 opacity-100 rotate-0' : 'scale-75 opacity-90 rotate-y-180'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {revealed ? (
+          <div className={`${tierClass} p-6 text-center relative overflow-hidden`}>
+            {tier === 'S' && (
+              <>
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/30 to-transparent animate-pulse" />
+                <div
+                  className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.8)_0,_rgba(255,255,255,0)_70%)] animate-ping"
+                  style={{ animationDuration: '3s' }}
+                />
+              </>
+            )}
+
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-2 text-inherit opacity-70 hover:opacity-100 text-2xl font-bold"
+              aria-label="Close results"
+            >
+              &times;
+            </button>
+
+            {imageUrl && !isNotBird && (
+              <div className={`relative mb-4 ${isSuperRare ? 'animate-bounce-small' : ''}`}>
+                <Image
+                  src={imageUrl}
+                  alt={`Captured image of ${species}`}
+                  fill
+                  className={`object-cover rounded-lg shadow-lg border-4 ${config.badgeClass}`}
+                />
+                {isSuperRare && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 animate-shine" />}
+              </div>
+            )}
+
+            {!isNotBird && (
+              <div className={`mb-3 inline-block transform ${isSuperRare ? 'animate-pulse' : ''}`}> 
+                <span className="text-sm font-medium uppercase tracking-wider">Rarity Tier</span>
+                <p className={`text-6xl font-bold drop-shadow-lg ${
+                  tier === 'S' ? 'text-yellow-300 animate-glow' :
+                  tier === 'A' ? 'text-blue-300' : config.textColor
+                }`}>{tier}</p>
+              </div>
+            )}
+
+            <h2 className={`text-3xl font-bold capitalize mb-4 drop-shadow-md ${isNotBird ? 'mt-8' : ''}`}>
+              {isNotBird ? 'No Bird Detected' : species.replace(/_/g, ' ')}
+            </h2>
+
+            {!isNotBird && <div className="flex justify-center mb-4">{renderStars(tier, 20)}</div>}
+
+            <p className="text-lg mt-2 opacity-90">
+              {isNotBird
+                ? 'Please try capturing an image with a clear view of a bird.'
+                : tier === 'S'
+                ? 'Incredible! An extremely rare find!'
+                : tier === 'A'
+                ? 'Amazing! A very rare bird!'
+                : tier === 'B'
+                ? 'Great! An uncommon species!'
+                : tier === 'C'
+                ? 'Nice! A moderately common bird.'
+                : tier === 'X'
+                ? 'Interesting! A data deficient species!'
+                : 'A common species, but still beautiful!'}
+            </p>
+
+            <div className="flex justify-center gap-3 mt-6">
+              {onShare && (
+                <button onClick={onShare} className="px-4 py-2 bg-blue-600/80 hover:bg-blue-700 text-white rounded-lg">
+                  Share
+                </button>
+              )}
+              <button onClick={onClose} className="px-4 py-2 bg-gray-600/80 hover:bg-gray-700 text-white rounded-lg">
+                Continue
+              </button>
+            </div>
+
+            <p className="text-xs opacity-70 mt-4">
+              {!isNotBird && 'Added to your collection!'}
+            </p>
+          </div>
+        ) : (
+          <div className="bg-gradient-to-br from-purple-600 to-blue-700 h-96 flex items-center justify-center">
+            <div className="text-white text-2xl font-bold animate-pulse">Revealing...</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ResultsDisplay;
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\context\CollectionContext.tsx
+// src/context/CollectionContext.tsx
+"use client";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+
+interface BirdEntry {
+    id: string;
+    species: string;
+    tier: string;
+    imageUrl: string;
+    capturedAt: string;
+}
+
+interface CollectionContextType {
+    collection: BirdEntry[];
+    addToCollection: (bird: Omit<BirdEntry, 'id' | 'capturedAt'>) => void;
+    getCollection: () => BirdEntry[];
+}
+
+const CollectionContext = createContext<CollectionContextType>({
+    collection: [],
+    addToCollection: () => {},
+    getCollection: () => [],
+});
+
+export function useCollection() {
+    return useContext(CollectionContext);
+}
+
+export default function CollectionProvider({ children }: { children: React.ReactNode }) {
+    const [collection, setCollection] = useState<BirdEntry[]>([]);
+
+    // Load collection from localStorage on mount
+    useEffect(() => {
+        try {
+            const stored = window.localStorage.getItem('birdCollection');
+            if (stored) {
+                setCollection(JSON.parse(stored));
+            }
+        } catch (err) {
+            console.error('Failed to load collection:', err);
+        }
+    }, []);
+
+    // Save collection to localStorage when it changes
+    useEffect(() => {
+        window.localStorage.setItem('birdCollection', JSON.stringify(collection));
+    }, [collection]);
+
+    // Add a new bird to the collection
+    const addToCollection = (bird: Omit<BirdEntry, 'id' | 'capturedAt'>) => {
+        const newEntry: BirdEntry = {
+            ...bird,
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            capturedAt: new Date().toISOString()
+        };
+
+        setCollection(prev => [newEntry, ...prev]);
+    };
+
+    // Get the full collection
+    const getCollection = () => collection;
+
+    return (
+        <CollectionContext.Provider value={{ collection, addToCollection, getCollection }}>
+            {children}
+        </CollectionContext.Provider>
+    );
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\context\TicketsContext.tsx
+// src/context/TicketsContext.tsx
+"use client";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+
+interface TicketsContextType {
+    tickets: number;
+    setTickets: (n: number) => void;
+    lastRewardDate: string | null;
+    claimDailyReward: () => boolean;
+    timeUntilNextReward: () => number | null;
+}
+
+const TicketsContext = createContext<TicketsContextType>({
+    tickets: 0,
+    setTickets: () => {},
+    lastRewardDate: null,
+    claimDailyReward: () => false,
+    timeUntilNextReward: () => null
+});
+
+export function useTickets() {
+    return useContext(TicketsContext);
+}
+
+/**
+ * Provides a tickets counter with daily reward functionality
+ */
+export default function TicketsProvider({ children }: { children: React.ReactNode }) {
+    const [tickets, setTickets] = useState<number>(0);
+    const [lastRewardDate, setLastRewardDate] = useState<string | null>(null);
+
+    // Initialize from localStorage
+    useEffect(() => {
+        const storedTickets = parseInt(window.localStorage.getItem('tickets') || '', 10);
+        if (!isNaN(storedTickets)) {
+            setTickets(storedTickets);
+        } else {
+            window.localStorage.setItem('tickets', '10');
+            setTickets(10);
+        }
+
+        const storedRewardDate = window.localStorage.getItem('lastRewardDate');
+        if (storedRewardDate) {
+            setLastRewardDate(storedRewardDate);
+        }
+    }, []);
+
+    // Persist changes to localStorage
+    useEffect(() => {
+        window.localStorage.setItem('tickets', tickets.toString());
+    }, [tickets]);
+
+    useEffect(() => {
+        if (lastRewardDate) {
+            window.localStorage.setItem('lastRewardDate', lastRewardDate);
+        }
+    }, [lastRewardDate]);
+
+    // Check if user can claim daily reward
+    const canClaimReward = (): boolean => {
+        if (!lastRewardDate) return true;
+
+        const last = new Date(lastRewardDate);
+        const now = new Date();
+
+        // Reset at midnight local time
+        return last.getDate() !== now.getDate() ||
+               last.getMonth() !== now.getMonth() ||
+               last.getFullYear() !== now.getFullYear();
+    };
+
+    // Claim daily reward
+    const claimDailyReward = (): boolean => {
+        if (canClaimReward()) {
+            setTickets(prev => prev + 5);
+            setLastRewardDate(new Date().toISOString());
+            return true;
+        }
+        return false;
+    };
+
+    // Calculate time until next reward
+    const timeUntilNextReward = (): number | null => {
+        if (!lastRewardDate) return 0;
+        if (canClaimReward()) return 0;
+
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+
+        return tomorrow.getTime() - now.getTime();
+    };
+
+    return (
+        <TicketsContext.Provider value={{
+            tickets,
+            setTickets,
+            lastRewardDate,
+            claimDailyReward,
+            timeUntilNextReward
+        }}>
+            {children}
+        </TicketsContext.Provider>
+    );
+}
+
+
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\hooks\useUserState.ts
+"use client";
+import { useEffect, useState } from "react";
+import { loc2state } from "@/lib/loc2state";
+
+export function useUserState(defaultState = "Connecticut") {
+  const [state, setState] = useState<string | null>(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const s = loc2state(pos.coords.latitude, pos.coords.longitude);
+        setState(s ?? defaultState);
+      },
+      () => setState(defaultState),        // geolocation blocked
+      { maximumAge: 86400, timeout: 8000 }
+    );
+  }, [defaultState]);
+
+  return state;
+}
+
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\loc2state.ts
+// src/lib/loc2state.ts
+import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson';
+import states from "@/data/na_states.geo.json";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import { point } from "@turf/helpers";
+
+// Define the exact type of your GeoJSON
+type StateProps = { name: string };
+type StateFC = FeatureCollection<Polygon | MultiPolygon, StateProps>;
+
+// Assert the import to that type (via unknown to avoid direct any)
+const stateGeo = states as unknown as StateFC;
+
+export function loc2state(lat: number, lon: number): string | null {
+  const pt = point([lon, lat]);
+  for (const f of stateGeo.features) {
+    if (booleanPointInPolygon(pt, f)) {
+      return f.properties.name;   // safe, name is typed
+    }
+  }
+  return null; // over ocean or unsupported region
+}
+
 File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\supabase.ts
 // ‼ never import this module in client-side code (contains Service Role key)
 import { createClient } from '@supabase/supabase-js';
@@ -297,69 +2736,183 @@ import { createClient } from '@supabase/supabase-js';
 export const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { global: { fetch } }
+  {
+    auth: { persistSession: false },
+    global: { fetch }
+  }
 );
 File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\tier.ts
-import { supabase } from '@/lib/supabase';
-// ‼ Simple in-memory cache for getTier (avoid N+1 queries within a request)
-const tierCache = new Map<string, string>();
+// src/lib/tier.ts
+import { supabase } from "@/lib/supabase";
 
-/**
- * Given a bird species name and optional location, returns its rarity tier.
- */
-export async function getTier(
-  species: string,
-  loc?: { latitude: number; longitude: number }
-): Promise<string> {
-  // Clean descriptors (e.g., "male", "female", "immature") from GPT output
-  const cleanName = species.replace(/^(male|female|immature)\s+/i, '');
-  // Determine county FIPS (default to New Haven '09009')
-  let county = '09009';
-  if (loc) {
-    const { data: counties, error: ctErr } = await supabase
-      .from('county')
-      .select('county_fips, lat, lon');
-    if (counties && counties.length > 0) {
-      let nearest = counties[0];
-      let minDist = Infinity;
-      for (const c of counties) {
-        const d2 = (c.lat - loc.latitude) ** 2 + (c.lon - loc.longitude) ** 2;
-        if (d2 < minDist) {
-          minDist = d2;
-          nearest = c;
-        }
-      }
-      county = nearest.county_fips;
+const cache = new Map<string, string>();
+
+/* new curve based on absolute counts */
+function toTier(n: number): string {
+  if (n === 0) return "X"; // extinct / unknown
+  if (n <= 30) return "S";
+  if (n <= 300) return "A";
+  if (n <= 3_000) return "B";
+  if (n <= 30_000) return "C";
+  return "D";
+}
+
+export async function getTier(species: string): Promise<string> {
+  // simple LRU-ish guard
+  if (cache.size > 5_000) cache.clear();
+
+  const name = species
+    .replace(/^(male|female|immature)\s+/i, "")
+    .toLowerCase();
+
+  if (cache.has(name)) return cache.get(name)!;
+
+  try {
+    /* map common name → species_code */
+    const { data: sp, error: spError } = await supabase
+      .from("species")
+      .select("species_code")
+      .ilike("com_name", name)
+      .single();
+
+    if (spError) {
+      console.error(`Error fetching species code for ${name}:`, spError);
+      return "X"; // Return unknown tier on error
     }
+
+    const code = sp?.species_code ?? "unknown";
+
+    /* look up record count */
+    const { data: freq, error: freqError } = await supabase
+      .from("species_freq")
+      .select("n_records")
+      .eq("species_code", code)
+      .single();
+
+    if (freqError) {
+      console.error(`Error fetching record count for code ${code}:`, freqError);
+      return "X"; // Return unknown tier on error
+    }
+
+    const n = freq?.n_records ?? 0;
+    const tier = toTier(n);
+    
+    cache.set(name, tier);
+    return tier;
+  } catch (error) {
+    console.error(`Unexpected error in getTier for ${name}:`, error);
+    return "X"; // Return unknown tier on any error
   }
-  // Cache key to memoize within a request
-  const cacheKey = `${cleanName.toLowerCase()}|${county}`;
-  if (tierCache.has(cacheKey)) {
-    return tierCache.get(cacheKey)!;
+}
+File: C:\Users\dexin\PycharmProjects\my-bird-gacha\my-bird-gacha\src\lib\tierUtils.tsx
+// src/lib/tierUtils.ts
+import { Star } from 'lucide-react';
+import React from 'react';
+
+export interface TierConfig {
+  name: string;
+  textColor: string;
+  bgGradient: string;
+  badgeClass: string;
+  borderColor?: string;
+  stars: number;
+  confettiCount?: number;
+  containerClass?: string;
+  nameClass?: string;
+  title?: string;
+}
+
+export function getTierConfig(tier: string): TierConfig {
+  switch(tier) {
+    case 'S': return {
+      name: "LEGENDARY",
+      stars: 5,
+      textColor: "text-yellow-300",
+      bgGradient: "from-yellow-500 to-orange-500",
+      badgeClass: "from-yellow-500 to-orange-500",
+      borderColor: "border-yellow-500",
+      confettiCount: 100,
+      containerClass: "bg-gradient-to-br from-yellow-900 via-orange-700 to-amber-600",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-300",
+      title: "LEGENDARY"
+    };
+    case 'A': return {
+      name: "EPIC",
+      stars: 4,
+      textColor: "text-purple-300",
+      bgGradient: "from-purple-600 to-pink-500",
+      badgeClass: "from-purple-600 to-pink-500",
+      borderColor: "border-purple-500",
+      confettiCount: 50,
+      containerClass: "bg-gradient-to-br from-purple-900 via-purple-700 to-fuchsia-800",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-pink-300",
+      title: "EPIC"
+    };
+    case 'B': return {
+      name: "RARE",
+      stars: 3,
+      textColor: "text-blue-300",
+      bgGradient: "from-blue-500 to-sky-400",
+      badgeClass: "from-blue-500 to-sky-400",
+      borderColor: "border-blue-500",
+      confettiCount: 20,
+      containerClass: "bg-gradient-to-br from-blue-900 via-blue-700 to-sky-800",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-sky-300",
+      title: "RARE"
+    };
+    case 'C': return {
+      name: "UNCOMMON",
+      stars: 2,
+      textColor: "text-green-300",
+      bgGradient: "from-green-500 to-lime-500",
+      badgeClass: "from-green-500 to-lime-500",
+      borderColor: "border-green-500",
+      confettiCount: 10,
+      containerClass: "bg-gradient-to-br from-green-900 via-green-700 to-lime-800",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-lime-300",
+      title: "UNCOMMON"
+    };
+    case 'X': return {
+      name: "UNKNOWN",
+      stars: 0,
+      textColor: "text-gray-400",
+      bgGradient: "from-gray-600 to-gray-500",
+      badgeClass: "from-gray-600 to-gray-500",
+      borderColor: "border-gray-500",
+      confettiCount: 0,
+      containerClass: "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-700",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-gray-400 to-gray-300",
+      title: "UNKNOWN"
+    };
+    default: return { // D Tier
+      name: "COMMON",
+      stars: 1,
+      textColor: "text-gray-400",
+      bgGradient: "from-gray-500 to-gray-400",
+      badgeClass: "from-gray-500 to-gray-400",
+      borderColor: "border-gray-500",
+      confettiCount: 0,
+      containerClass: "bg-gradient-to-br from-gray-800 via-gray-700 to-slate-800",
+      nameClass: "bg-clip-text text-transparent bg-gradient-to-r from-gray-300 to-gray-100",
+      title: "COMMON"
+    };
   }
-  // Map species common name to species_code
-  const { data: sp, error: spErr } = await supabase
-    .from('species')
-    .select('species_code')
-    .ilike('com_name', cleanName)
-    .limit(1)
-    .single();
-  const code = sp?.species_code ?? 'unknown';
-  // Lookup frequency percentile
-  const { data: freq, error: freqErr } = await supabase
-    .from('checklist_freq')
-    .select('percentile')
-    .eq('species_code', code)
-    .eq('county_fips', county)
-    .single();
-  const p = freq?.percentile ?? 100;
-  // Map percentile to rarity tier
-  let tier: string;
-  if (p < 0.1) tier = 'S';
-  else if (p < 1) tier = 'A';
-  else if (p < 5) tier = 'B';
-  else if (p < 20) tier = 'C';
-  else tier = 'D';
-  tierCache.set(cacheKey, tier);
-  return tier;
+}
+
+export function renderStars(tier: string, size: number = 16) {
+  const config = getTierConfig(tier);
+  return (
+    <div className="flex gap-[2px]">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          size={size}
+          fill={i < config.stars ? "currentColor" : "none"}
+          stroke={i < config.stars ? "none" : "currentColor"}
+          strokeWidth={1.5}
+          className={i < config.stars ? "text-yellow-400" : "text-gray-500"}
+        />
+      ))}
+    </div>
+  );
 }

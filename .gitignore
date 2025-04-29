@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+species_seed.csv
+
+Clements-v2023-October-2023.csv

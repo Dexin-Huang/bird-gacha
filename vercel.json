@@ -3,8 +3,8 @@
 
   "crons": [
     {
-      "path": "/api/cron-sync-ebird",
-      "schedule": "0 4 * * *"
+      "path": "/api/cron-sync-global",
+      "schedule": "0 4 * * 1"
     }
   ]
 }

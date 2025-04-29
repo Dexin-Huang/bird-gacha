@@ -1,63 +1,62 @@
-import { supabase } from '@/lib/supabase';
-// ‼ Simple in-memory cache for getTier (avoid N+1 queries within a request)
-const tierCache = new Map<string, string>();
+// src/lib/tier.ts
+import { supabase } from "@/lib/supabase";
 
-/**
- * Given a bird species name and optional location, returns its rarity tier.
- */
-export async function getTier(
-  species: string,
-  loc?: { latitude: number; longitude: number }
-): Promise<string> {
-  // Clean descriptors (e.g., "male", "female", "immature") from GPT output
-  const cleanName = species.replace(/^(male|female|immature)\s+/i, '');
-  // Determine county FIPS (default to New Haven '09009')
-  let county = '09009';
-  if (loc) {
-    const { data: counties, error: ctErr } = await supabase
-      .from('county')
-      .select('county_fips, lat, lon');
-    if (counties && counties.length > 0) {
-      let nearest = counties[0];
-      let minDist = Infinity;
-      for (const c of counties) {
-        const d2 = (c.lat - loc.latitude) ** 2 + (c.lon - loc.longitude) ** 2;
-        if (d2 < minDist) {
-          minDist = d2;
-          nearest = c;
-        }
-      }
-      county = nearest.county_fips;
+const cache = new Map<string, string>();
+
+/* new curve based on absolute counts */
+function toTier(n: number): string {
+  if (n === 0) return "X"; // extinct / unknown
+  if (n <= 30) return "S";
+  if (n <= 300) return "A";
+  if (n <= 3_000) return "B";
+  if (n <= 30_000) return "C";
+  return "D";
+}
+
+export async function getTier(species: string): Promise<string> {
+  // simple LRU-ish guard
+  if (cache.size > 5_000) cache.clear();
+
+  const name = species
+    .replace(/^(male|female|immature)\s+/i, "")
+    .toLowerCase();
+
+  if (cache.has(name)) return cache.get(name)!;
+
+  try {
+    /* map common name → species_code */
+    const { data: sp, error: spError } = await supabase
+      .from("species")
+      .select("species_code")
+      .ilike("com_name", name)
+      .single();
+
+    if (spError) {
+      console.error(`Error fetching species code for ${name}:`, spError);
+      return "X"; // Return unknown tier on error
     }
+
+    const code = sp?.species_code ?? "unknown";
+
+    /* look up record count */
+    const { data: freq, error: freqError } = await supabase
+      .from("species_freq")
+      .select("n_records")
+      .eq("species_code", code)
+      .single();
+
+    if (freqError) {
+      console.error(`Error fetching record count for code ${code}:`, freqError);
+      return "X"; // Return unknown tier on error
+    }
+
+    const n = freq?.n_records ?? 0;
+    const tier = toTier(n);
+    
+    cache.set(name, tier);
+    return tier;
+  } catch (error) {
+    console.error(`Unexpected error in getTier for ${name}:`, error);
+    return "X"; // Return unknown tier on any error
   }
-  // Cache key to memoize within a request
-  const cacheKey = `${cleanName.toLowerCase()}|${county}`;
-  if (tierCache.has(cacheKey)) {
-    return tierCache.get(cacheKey)!;
-  }
-  // Map species common name to species_code
-  const { data: sp, error: spErr } = await supabase
-    .from('species')
-    .select('species_code')
-    .ilike('com_name', cleanName)
-    .limit(1)
-    .single();
-  const code = sp?.species_code ?? 'unknown';
-  // Lookup frequency percentile
-  const { data: freq, error: freqErr } = await supabase
-    .from('checklist_freq')
-    .select('percentile')
-    .eq('species_code', code)
-    .eq('county_fips', county)
-    .single();
-  const p = freq?.percentile ?? 100;
-  // Map percentile to rarity tier
-  let tier: string;
-  if (p < 0.1) tier = 'S';
-  else if (p < 1) tier = 'A';
-  else if (p < 5) tier = 'B';
-  else if (p < 20) tier = 'C';
-  else tier = 'D';
-  tierCache.set(cacheKey, tier);
-  return tier;
 }

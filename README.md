@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment Variables
+
+Before deploying, ensure the following environment variables are configured (e.g. in Vercel):
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY` (Service Role key; required for cron and server operations)
+- `OPENAI_API_KEY`
+- `EBIRD_KEY` (only if using the eBird-based pipeline)
+
+Without `SUPABASE_SERVICE_ROLE_KEY`, the global rarity sync will fail with `401 Unauthorized`.
