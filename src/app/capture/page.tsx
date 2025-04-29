@@ -219,7 +219,7 @@ export default function CapturePage() {
             })
             .catch((error) => console.log('Error sharing:', error));
         } else {
-            toast.info("Sharing not supported on this device.");
+            toast("Sharing not supported on this device.");
         }
     }, [result]);
 

@@ -1,14 +1,19 @@
-// src/lib/anonId.ts
 import { cookies } from "next/headers";
 
-export function getAnonId(): string {
-  const NAME   = "anon_id";
-  const jar    = cookies();
-  const exist  = jar.get(NAME)?.value;
-  if (exist) return exist;
+/**
+ * Retrieves or mints an anonymous ID stored in cookies.
+ * @returns A Promise resolving to the anon_id string.
+ */
+export async function getAnonId(): Promise<string> {
+  const NAME = "anon_id";
+  const jar = await cookies();
+  const existing = jar.get(NAME)?.value;
+  if (existing) {
+    return existing;
+  }
 
-  // first visit → mint ID, keep for one year
-  const id = crypto.randomUUID();                  // built-in
+  // First visit → mint ID, keep for one year
+  const id = crypto.randomUUID();
   jar.set(NAME, id, {
     httpOnly: true,
     sameSite: "lax",

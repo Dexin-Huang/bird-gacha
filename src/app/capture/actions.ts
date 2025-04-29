@@ -1,11 +1,10 @@
-// src/app/capture/actions.ts
 "use server";
 
-import OpenAI                       from "openai";
-import { Buffer }                   from "buffer";
-import { createClient }             from "@supabase/supabase-js";
-import { getAnonId }                from "@/lib/anonId";
-import { toTier }                   from "@/lib/tier";        // absolute-count helper
+import OpenAI               from "openai";
+import { Buffer }           from "buffer";
+import { createClient }     from "@supabase/supabase-js";
+import { getAnonId }        from "@/lib/anonId";
+import { toTier }           from "@/lib/tier";
 
 const supa = createClient(
   process.env.SUPABASE_URL!,
@@ -16,33 +15,44 @@ const supa = createClient(
 const MODEL  = "gpt-4o";
 const DETAIL = "auto";
 
-/* ---------- thin helper wrappers around RPCs ------------------ */
+/* ---------- helper RPC wrappers ------------------------------- */
 async function burnTicket(anon: string) {
-  const { data, error } = await supa.rpc("at_consume", { _anon: anon, _n: 1 });
-  if (error || !data) throw new Error("No tickets left.");
+  const { data, error } = await supa.rpc("at_consume", { _anon: anon, _n: 1 }).single();
+  if (error || !data) throw new Error(error?.message ?? "No tickets left.");
 }
+
 async function rateLimit(anon: string, route = "analyze") {
-  const { error } = await supa.rpc("at_rate", { _anon: anon, _route: route });
+  const { error } = await supa.rpc("at_rate", { _anon: anon, _route: route }).single();
   if (error) throw new Error("Slow down – too many pulls.");
 }
+
 async function fuzzyToCode(name: string) {
-  const { data } = await supa.rpc("fuzzy_name_to_code", { _name: name });
-  return data as string | null;
+  const { data, error } = await supa
+    .rpc("fuzzy_name_to_code", { _name: name })
+    .single<string>();                     // 👈 row is simple TEXT
+  if (error) throw new Error(error.message);
+  return data ?? null;
 }
+
 async function getLocalTier(code: string, state: string) {
-  const { data } = await supa.rpc("local_tier", { _code: code, _state: state });
-  return (data ?? "X") as string;
+  const { data, error } = await supa
+    .rpc("local_tier", { _code: code, _state: state })
+    .single<string>();                     // 👈 row is simple TEXT
+  if (error) throw new Error(error.message);
+  return data ?? "X";
 }
 
 /* -------------------- identify via OpenAI --------------------- */
 async function identify(base64: string, state: string) {
-  const { csv } = await supa
-    .rpc("get_shortlist_csv", {     // **OPTIONAL** small SQL helper
-      _state: state
-    })
-    .single();                      // returns csv of species_code allowed
+  // get_shortlist_csv returns one TEXT column named csv
+  const { data, error } = await supa
+    .rpc("get_shortlist_csv", { _state: state })
+    .single<{ csv: string }>();            // 👈 row shape
+  if (error || !data) throw new Error(error?.message ?? "Failed to fetch shortlist.");
+  const { csv } = data;
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
   const rsp = await openai.chat.completions.create({
     model: MODEL,
     max_tokens: 40,
@@ -58,9 +68,11 @@ async function identify(base64: string, state: string) {
       {
         role: "user",
         content: [
-          { type: "text",  text: `Allowed species codes:\n${csv}` },
-          { type: "image_url",
-            image_url: { url: `data:image/jpeg;base64,${base64}`, detail: DETAIL } }
+          { type: "text", text: `Allowed species codes:\n${csv}` },
+          {
+            type: "image_url",
+            image_url: { url: `data:image/jpeg;base64,${base64}`, detail: DETAIL },
+          },
         ],
       },
     ],
@@ -71,7 +83,7 @@ async function identify(base64: string, state: string) {
 
 /* =================== PUBLIC ACTION ============================ */
 export async function analyze(file: File, state: string) {
-  const anon = getAnonId();
+  const anon = await getAnonId();     // now awaited
 
   await rateLimit(anon);
   await burnTicket(anon);
@@ -85,17 +97,17 @@ export async function analyze(file: File, state: string) {
   }
 
   /* ----------  happy path ---------- */
-  // check if code exists; otherwise fall back to fuzzy match
-  let code       = species_code;
-  let name       = common_name;
-  let tier       : string;
+  let code = species_code;
+  let name = common_name;
+  let tier: string;
 
+  // verify code exists; else fuzzy-match
   const { count } = await supa
     .from("species")
     .select("species_code", { head: true, count: "exact" })
     .eq("species_code", code);
 
-  if ((count ?? 0) === 0) {                         // hallucinated code
+  if ((count ?? 0) === 0) {
     const resolved = await fuzzyToCode(common_name);
     if (!resolved) {
       return { species: common_name ?? "Unknown", tier: "X", confidence };
@@ -106,22 +118,24 @@ export async function analyze(file: File, state: string) {
   /* tier – local first, else global absolute */
   tier = await getLocalTier(code, state);
   if (tier === "X") {
-    const { data } = await supa
+    const { data, error } = await supa
       .from("species")
       .select("n_records")
       .eq("species_code", code)
       .single();
-    tier = toTier(data?.n_records ?? 0);
+    if (error || !data) throw new Error(error?.message ?? "Failed to fetch records.");
+    tier = toTier(data.n_records ?? 0);
   }
 
   /* friendly name */
   if (!name) {
-    const { data } = await supa
+    const { data, error } = await supa
       .from("species")
       .select("com_name")
       .eq("species_code", code)
       .single();
-    name = data?.com_name ?? code;
+    if (error || !data) throw new Error(error?.message ?? "Failed to fetch name.");
+    name = data.com_name ?? code;
   }
 
   return { species: name, tier, confidence };

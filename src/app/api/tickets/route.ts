@@ -1,9 +1,8 @@
-// src/app/api/tickets/route.ts
-import { cookies }          from "next/headers";
-import { NextResponse }     from "next/server";
-import { createClient }     from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-export const dynamic = "force-dynamic";   // this route reads/writes cookies
+export const dynamic = "force-dynamic";
 
 const supa = createClient(
   process.env.SUPABASE_URL!,
@@ -11,28 +10,24 @@ const supa = createClient(
   { auth: { persistSession: false }, global: { fetch } }
 );
 
-/* ------------------------------------------------------------------ */
-/* helper – returns the anon-id for this browser, minting one if none */
-/* ------------------------------------------------------------------ */
 async function getAnonId(): Promise<string> {
-  const jar  = await cookies();           // ← must await in App Router
+  const jar = await cookies();
   const NAME = "anon_id";
 
   let id = jar.get(NAME)?.value;
   if (id) return id;
 
-  id = crypto.randomUUID();               // built-in, no dependency
+  id = crypto.randomUUID();
   jar.set(NAME, id, {
-    httpOnly : true,
-    sameSite : "lax",
-    secure   : process.env.NODE_ENV === "production",
-    maxAge   : 60 * 60 * 24 * 365,        // 1 year
-    path     : "/",
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
   });
   return id;
 }
 
-/* ------------------  GET /api/tickets  ------------------ */
 export async function GET() {
   const anon = await getAnonId();
 
@@ -56,27 +51,34 @@ export async function GET() {
   return NextResponse.json({ tickets: balance, lastRewardISO: lastISO });
 }
 
-/* ------------------  POST /api/tickets  ------------------ */
 export async function POST() {
   const anon = await getAnonId();
-  const { error } = await supa.rpc("at_claim_daily", { _anon: anon });
+  const { error: rpcError } = await supa.rpc("at_claim_daily", { _anon: anon });
 
-  if (error) {
+  if (rpcError) {
     return NextResponse.json(
-      { granted: false, message: error.message },
-      { status: 400 },
+      { granted: false, message: rpcError.message },
+      { status: 400 }
     );
   }
 
-  const { data } = await supa
+  // Fetch updated tickets after claiming
+  const { data, error: selectError } = await supa
     .from("anon_tickets")
     .select("tickets,last_daily_reward")
     .eq("anon_id", anon)
     .single();
 
+  if (selectError || !data) {
+    return NextResponse.json(
+      { granted: false, message: selectError?.message ?? "Tickets data not found." },
+      { status: 500 }
+    );
+  }
+
   return NextResponse.json({
-    granted      : true,
-    tickets      : data.tickets,
+    granted: true,
+    tickets: data.tickets,
     lastRewardISO: data.last_daily_reward,
   });
 }
